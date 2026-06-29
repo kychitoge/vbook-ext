@@ -25,22 +25,24 @@ async function handleValidateCommand(options, workspaceRoot) {
 
         // 1. AST Validation for ES5/Rhino compatibility
         try {
-            acorn.parse(code, { ecmaVersion: 5 });
-            console.log(`  ✓ Syntax: ES5 compatible.`);
+            acorn.parse(code, { ecmaVersion: file === 'config.js' ? 6 : 5 });
+            console.log(`  ✓ Syntax: ${file === 'config.js' ? 'ES6 (for let BASE_URL)' : 'ES5'} compatible.`);
         } catch (err) {
             console.warn(`  ✗ Syntax Error (ES5 incompatible at ${err.loc.line}:${err.loc.column}): ${err.message}`);
             overallSuccess = false;
         }
 
         // 2. VBook API Pattern Checks
-        if (!code.includes('function execute')) {
-            console.warn(`  ✗ Missing 'function execute(...)' entry point.`);
-            overallSuccess = false;
-        } else {
-            console.log(`  ✓ Found 'execute' function.`);
+        if (file !== 'config.js') {
+            if (!code.includes('function execute')) {
+                console.warn(`  ✗ Missing 'function execute(...)' entry point.`);
+                overallSuccess = false;
+            } else {
+                console.log(`  ✓ Found 'execute' function.`);
+            }
         }
 
-        if (code.includes('const ') || code.includes('let ')) {
+        if (code.includes('const ') || (file !== 'config.js' && code.includes('let '))) {
             console.warn(`  ! Warning: 'const/let' detected. Ensure your Rhino runtime supports them.`);
         }
     }

@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "name": "[QQ] html5",
+    "author": "kychi",
+    "version": 1,
+    "source": "https://novel.html5.qq.com",
+    "regexp": "novel\\.html5\\.qq\\.com/.*|bookshelf\\.html5\\.qq\\.com/.*",
+    "description": "QQ浏览器小说接口书源",
+    "locale": "zh_CN",
+    "type": "chinese_novel",
+    "language": "javascript"
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "search": "search.js",
+    "detail": "detail.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
+  }
+}

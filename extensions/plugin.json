@@ -290,6 +290,72 @@
         "type": "chinese_novel",
         "language": "javascript"
       }
+    },
+    {
+      "folder": "kychi_html5qq",
+      "name": "[QQ] html5",
+      "author": "kychi",
+      "description": "QQ浏览器小说接口书源",
+      "source": "https://novel.html5.qq.com",
+      "version": 1,
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "relativePath": "extensions/chinese_novel/kychi_html5qq",
+      "metadata": {
+        "name": "[QQ] html5",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://novel.html5.qq.com",
+        "regexp": "novel\\.html5\\.qq\\.com/.*|bookshelf\\.html5\\.qq\\.com/.*",
+        "description": "QQ浏览器小说接口书源",
+        "locale": "zh_CN",
+        "type": "chinese_novel",
+        "language": "javascript"
+      }
+    },
+    {
+      "folder": "kychi_novelcooks",
+      "name": "NovelCooks",
+      "author": "kychi",
+      "description": "nguồn truyện cà chua, search đểu cực kì + trạng thái hoàn thành điêu",
+      "source": "https://novel.cooks.tw",
+      "version": 1,
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "relativePath": "extensions/chinese_novel/kychi_novelcooks",
+      "metadata": {
+        "name": "NovelCooks",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://novel.cooks.tw",
+        "regexp": "novel\\.cooks\\.tw/novel\\.html\\?.*articleid=\\d+.*",
+        "description": "nguồn truyện cà chua, search đểu cực kì + trạng thái hoàn thành điêu",
+        "locale": "zh_CN",
+        "type": "chinese_novel",
+        "language": "javascript"
+      }
+    },
+    {
+      "folder": "kychi-cachua-c2",
+      "name": "[Fanqie] Cà Chua C2 ",
+      "author": "kychi",
+      "description": "Nguồn truyện chữ từ Fanqie Novel. Dùng các server trung gian mirror",
+      "source": "https://fanqienovel.com",
+      "version": 1,
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "relativePath": "extensions/chinese_novel/kychi-cachua-c2",
+      "metadata": {
+        "name": "[Fanqie] Cà Chua C2 ",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://fanqienovel.com",
+        "regexp": "fanqienovel\\.com/.*|m\\.zym888\\.com/.*",
+        "description": "Nguồn truyện chữ từ Fanqie Novel. Dùng các server trung gian mirror",
+        "locale": "zh_CN",
+        "type": "chinese_novel",
+        "language": "javascript"
+      }
     }
   ],
   "translate": [],

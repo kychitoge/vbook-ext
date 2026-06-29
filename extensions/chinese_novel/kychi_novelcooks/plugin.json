@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "name": "NovelCooks",
+    "author": "kychi",
+    "version": 1,
+    "source": "https://novel.cooks.tw",
+    "regexp": "novel\\.cooks\\.tw/novel\\.html\\?.*articleid=\\d+.*",
+    "description": "nguồn truyện cà chua, search đểu cực kì + trạng thái hoàn thành điêu",
+    "locale": "zh_CN",
+    "type": "chinese_novel",
+    "language": "javascript"
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "search": "search.js",
+    "detail": "detail.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
+  }
+}
