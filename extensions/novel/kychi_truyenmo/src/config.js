@@ -1,4 +1,4 @@
-var BASE_URL = 'https://www.truyenmo.com';
+var BASE_URL = 'https://www.truyenmo.xyz';
 var BASE_UA = 'Mozilla/5.0 (Linux; Android 12; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36';
 
 try {
