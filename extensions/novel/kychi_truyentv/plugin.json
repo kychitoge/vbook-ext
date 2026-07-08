@@ -2,10 +2,10 @@
   "metadata": {
     "name": "TruyenTv",
     "author": "kychi",
-    "version": 3,
-    "source": "https://www.tvtruyen.us/",
-    "regexp": "(www\\.)?tvtruyen\\.us/.*",
-    "description": "Đọc truyện từ TruyenTv.",
+    "version": 5,
+    "source": "https://www.tvtruyen.site/",
+    "regexp": "(www\\.)?tvtruyen\\.(site|us|net|com|vn|io|tv|me|top|online|xyz|info|cc|lol|gg)/.*",
+    "description": "Đọc truyện từ TruyenTv.\n\n⚙️ TÙY CHỈNH DOMAIN:\nTrang này rất hay đổi domain. Nếu link chết, vào Setting của ext nhập URL mới vào ô bên dưới — không cần chờ update code.\n\nVD: https://www.tvtruyen.xyz",
     "locale": "vi_VN",
     "language": "javascript",
     "type": "novel"
@@ -20,5 +20,13 @@
     "toc": "toc.js",
     "chap": "chap.js",
     "comment": "comment.js"
+  },
+  "config": {
+    "CONFIG_URL": {
+      "title": "🌐 URL Domain tùy chỉnh",
+      "description": "Nhập URL mới nếu domain mặc định bị chặn hoặc đổi. VD: https://www.tvtruyen.xyz\nĐể trống để dùng mặc định.",
+      "mode": "input",
+      "default": ""
+    }
   }
 }

@@ -17,8 +17,12 @@ function execute(input, page) {
 
     if (!response.ok) return Response.error('HTTP Error: ' + response.status);
 
-    var html = response.text();
-    var doc = response.html();
+    var rawHtml = response.text();
+    if (!rawHtml) return Response.success([], '');
+
+    var doc = Html.parse(rawHtml);
+    if (!doc) return Response.success([], '');
+
     var comments = [];
     var seen = {};
 
@@ -53,7 +57,7 @@ function execute(input, page) {
     if (totalComments > currentNum && comments.length > 0) {
         next = JSON.stringify({ storyId: storyId, page: currentNum + 1 });
     } else {
-        var nextLink = doc.select('button[onclick*="more_comments"], a[onclick*="more_comments"], .paging a[href*="more-comments"], .paging button[onclick*="more_comments"]').first();
+        var nextLink = doc.select('button[onclick*="more_comments"], a[onclick*="more_comments"], .paging a[href*="more-comments"]').first();
         if (nextLink) {
             next = JSON.stringify({ storyId: storyId, page: currentNum + 1 });
         }
@@ -69,11 +73,7 @@ function parseCommentInput(input, page) {
         if (!value) return null;
         var str = String(value);
         if (str.charAt(0) === '{') {
-            try {
-                return JSON.parse(str);
-            } catch (error) {
-                return null;
-            }
+            try { return JSON.parse(str); } catch (e) { return null; }
         }
         return str;
     }
@@ -101,7 +101,9 @@ function parseCommentInput(input, page) {
 }
 
 function parseTotalComments(doc) {
-    var text = cleanText(doc.select('p').first().text());
+    var firstP = doc.select('p').first();
+    if (!firstP) return 0;
+    var text = cleanText(firstP.text());
     var match = text.match(/(\d+)\s*bình luận/i);
     if (!match) return 0;
     return parseInt(match[1], 10) || 0;

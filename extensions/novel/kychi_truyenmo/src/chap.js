@@ -1,14 +1,16 @@
 load('config.js');
 
-
 function execute(url) {
     url = normalizeUrl(url);
     var response = fetchPage(url);
     if (!response.ok) return Response.error('HTTP Error: ' + response.status);
 
     var rawHtml = response.text();
+    if (!rawHtml) return Response.error('Trang trống');
+
     var map = extractBeforeContentMap(rawHtml);
-    var doc = response.html();
+    var doc = Html.parse(rawHtml);
+    if (!doc) return Response.error('Không thể parse HTML');
 
     var contentEl = doc.select('#chapter-content-render').first();
     if (!contentEl) contentEl = doc.select('.chapter-content .content-container').first();
@@ -19,7 +21,7 @@ function execute(url) {
     contentEl.select('.signature, p.signature').remove();
     contentEl.select('.affClick').remove();
     var affActive = contentEl.select('.affActive');
-    if (affActive.size() > 0) {
+    if (affActive && affActive.size() > 0) {
         affActive.attr('style', '');
     }
     contentEl.select('[style*="display:none"], [style*="display: none"], [style*="font-size:0"], [style*="font-size: 0"], [hidden]').remove();

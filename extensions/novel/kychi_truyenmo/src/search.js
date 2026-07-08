@@ -12,6 +12,8 @@ function execute(keyword, page) {
     if (!response.ok) return Response.error('HTTP Error: ' + response.status);
 
     var doc = response.html();
+    if (!doc) return Response.success([], '');
+
     var data = [];
     var seen = {};
 

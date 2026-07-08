@@ -65,19 +65,7 @@ function buildPageUrl(url, page) {
         return url.replace(/([?&]page=)\d+/i, '$1' + page);
     }
 
-    if (url.indexOf('/tim-kiem') >= 0 || url.indexOf('?') >= 0) {
-        return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'page=' + page;
-    }
-
-    if (/\/trang-\d+\.html$/i.test(url)) {
-        return url.replace(/\/trang-\d+\.html$/i, '/trang-' + page + '.html');
-    }
-
-    if (/\.html$/i.test(url)) {
-        return url.replace(/\.html$/i, '/trang-' + page + '.html');
-    }
-
-    return url.replace(/\/+$/, '') + '/trang-' + page + '.html';
+    return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'page=' + page;
 }
 
 function cleanText(text) {

@@ -1,4 +1,9 @@
-var BASE_URL = "https://www.tvtruyen.us";
+// config.js — TruyenTv Extension
+// Dùng let để VBook có thể inject CONFIG_URL khi cần (cả system lẫn user setting)
+let BASE_URL = "https://www.tvtruyen.site";
+
+try { if (CONFIG_URL) BASE_URL = CONFIG_URL; } catch (e) {}
+
 var BASE_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 function fetchPage(url, options) {
