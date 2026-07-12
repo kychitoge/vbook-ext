@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "name": "Audio Truyện Full",
+    "author": "kychi",
+    "version": 1,
+    "source": "https://vip.audiotruyenfull.org/",
+    "regexp": "(?:vip\\.|web\\.)?audiotruyenfull\\.org/(?:truyen/|story/)?[a-z0-9\\-]+/?$",
+    "description": "Đọc truyện chữ, truyện audio online chất lượng cao từ Audio Truyện Full",
+    "locale": "vi_VN",
+    "type": "novel",
+    "language": "javascript"
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "chap": "chap.js",
+    "gen": "gen.js",
+    "suggests": "suggests.js"
+  }
+}
