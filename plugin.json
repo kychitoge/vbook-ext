@@ -248,6 +248,17 @@
       "locale": "zh_CN"
     },
     {
+      "name": "Snapd",
+      "author": "kychi",
+      "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/snapd/plugin.zip",
+      "version": 1,
+      "source": "https://m.snapd.net",
+      "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/snapd/icon.png",
+      "description": "Đọc truyện chữ từ m.snapd.net (笔趣阁). Hỗ trợ cấu hình động tên miền trang chi tiết SPA.",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "OPhim",
       "author": "kychi",
       "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/video/kychi_ophim/plugin.zip",

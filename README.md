@@ -1,6 +1,15 @@
 # vBook Extensions Repository - kychi
 
 Nguồn mở rộng (extensions) của **vBook**
+
+---
+
+### ☕ Ủng hộ ly cà phê cho kychi
+
+Nếu bạn thích các extension của mình, bạn có thể ủng hộ mình một ly cà phê qua mã QR dưới đây:
+
+![QR Ủng hộ ly cà phê](qr.png)
+
 ---
 
 ### 1. Link Nguồn Mở Rộng
@@ -37,6 +46,7 @@ https://raw.githubusercontent.com/kychitoge/vbook-ext/main/plugin.json
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/canhcut/icon.png" width="40"> | **[QQ] Cánh Cụt** | [book.qq.com](https://book.qq.com/) | 1 | chinese_novel | zh_CN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/kychi_novelcooks/icon.png" width="40"> | **NovelCooks** | [novel.cooks.tw](https://novel.cooks.tw) | 2 | chinese_novel | zh_CN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/kychi_html5qq/icon.png" width="40"> | **[QQ] html5** | [novel.html5.qq.com](https://novel.html5.qq.com) | 1 | chinese_novel | zh_CN |
+| <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/snapd/icon.png" width="40"> | **Snapd** | [m.snapd.net](https://m.snapd.net) | 1 | chinese_novel | zh_CN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/video/kychi_ophim/icon.png" width="40"> | **OPhim** | [ophim17.cc](https://ophim17.cc) | 1 | video | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/video/kychi_phimfun/icon.png" width="40"> | **PhimFun** | [phimfun.net](https://phimfun.net) | 1 | video | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/video/kychi_motchill/icon.png" width="40"> | **Motchill** | [envasion.net](https://envasion.net) | 1 | video | vi_VN |
