@@ -22,6 +22,28 @@
     }
   },
   {
+    "folder": "kychi_cachua_c3",
+    "name": "Cà Chua C3",
+    "author": "kychi",
+    "description": "Nguồn truyện chữ Trung Quốc từ Fanqie Novel, sử dụng thuật toán xGorgon cục bộ và tự động lấy Session.",
+    "source": "https://fanqienovel.com",
+    "version": 1,
+    "type": "chinese_novel",
+    "locale": "zh_CN",
+    "relativePath": "extensions/chinese_novel/kychi_cachua_c3",
+    "metadata": {
+      "name": "Cà Chua C3",
+      "author": "kychi",
+      "version": 1,
+      "source": "https://fanqienovel.com",
+      "regexp": "fanqienovel\\.com/[^/]+/?$",
+      "description": "Nguồn truyện chữ Trung Quốc từ Fanqie Novel, sử dụng thuật toán xGorgon cục bộ và tự động lấy Session.",
+      "locale": "zh_CN",
+      "type": "chinese_novel",
+      "language": "javascript"
+    }
+  },
+  {
     "folder": "kychi_html5qq",
     "name": "[QQ] html5",
     "author": "kychi",
@@ -67,24 +89,46 @@
   },
   {
     "folder": "kychi-cachua-c2",
-    "name": "[Fanqie] Cà Chua C2 ",
+    "name": "[Fanqie] Cà Chua C2",
     "author": "kychi",
-    "description": "Nguồn truyện chữ từ Fanqie Novel. Dùng các server trung gian mirror",
+    "description": "Nguồn truyện chữ từ Fanqie Novel (番茄小说). Dùng proxy mirror để đọc nội dung.",
     "source": "https://fanqienovel.com",
-    "version": 1,
+    "version": 2,
     "type": "chinese_novel",
     "locale": "zh_CN",
     "relativePath": "extensions/chinese_novel/kychi-cachua-c2",
     "metadata": {
-      "name": "[Fanqie] Cà Chua C2 ",
+      "name": "[Fanqie] Cà Chua C2",
       "author": "kychi",
-      "version": 1,
+      "version": 2,
       "source": "https://fanqienovel.com",
-      "regexp": "fanqienovel\\.com/.*|m\\.zym888\\.com/.*",
-      "description": "Nguồn truyện chữ từ Fanqie Novel. Dùng các server trung gian mirror",
+      "regexp": "fanqienovel\\.com/page/[0-9]+",
+      "description": "Nguồn truyện chữ từ Fanqie Novel (番茄小说). Dùng proxy mirror để đọc nội dung.",
       "locale": "zh_CN",
       "type": "chinese_novel",
       "language": "javascript"
+    }
+  },
+  {
+    "folder": "snapd",
+    "name": "Snapd",
+    "author": "kychi",
+    "description": "Tiện ích đọc truyện chữ từ m.snapd.net (笔趣阁)",
+    "source": "https://m.snapd.net",
+    "version": 1,
+    "type": "chinese_novel",
+    "locale": "zh_CN",
+    "relativePath": "extensions/chinese_novel/snapd",
+    "metadata": {
+      "name": "Snapd",
+      "author": "kychi",
+      "version": 1,
+      "source": "https://m.snapd.net",
+      "regexp": "(?:m\\\\.snapd\\\\.net\\\\/read|bqg\\\\w+\\\\.\\\\w+\\\\/(?:#\\\\/)?book)\\\\/\\\\d+",
+      "description": "Tiện ích đọc truyện chữ từ m.snapd.net (笔趣阁)",
+      "locale": "zh_CN",
+      "language": "javascript",
+      "type": "chinese_novel"
     }
   }
 ]
