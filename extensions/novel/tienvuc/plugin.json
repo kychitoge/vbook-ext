@@ -2,10 +2,10 @@
   "metadata": {
     "name": "Tiên Vực",
     "author": "Nhocconsr",
-    "version": 14,
-    "source": "https://tienvuc.top",
+    "version": 16,
+    "source": "https://tienvuc.blog",
     "regexp": "^https?://(www\\.)?tienvuc\\.[^/]+/[a-z0-9-]+",
-    "description": "Tiên Vực- repo kychi\n\n v14: add beta kéo xuống dưới để đổi domain",
+    "description": "Tiên Vực - repo kychi\n\n v16: Nâng cấp detail & comment\n v15: fix crypto chap \n\n KÉO XUỐNG DƯỚI ĐỂ ĐỔI DOMAIN",
     "locale": "vi_VN",
     "language": "javascript",
     "type": "novel"
@@ -16,15 +16,15 @@
     "detail": "detail.js",
     "search": "search.js",
     "toc": "toc.js",
-    "chap": "chap.js"
+    "chap": "chap.js",
+    "comment": "comment.js"
   },
-  "config":{
+  "config": {
     "CONFIG_URL": {
       "title": "Đổi domain",
       "description": "Nhập URL mới nếu domain mặc định bị chặn hoặc đổi.",
       "mode": "input",
       "default": ""
     }
-    
   }
 }

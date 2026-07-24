@@ -372,10 +372,10 @@
       "name": "Tiên Vực",
       "author": "Nhocconsr",
       "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/tienvuc/plugin.zip",
-      "version": 14,
+      "version": 16,
       "source": "https://tienvuc.top",
       "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/tienvuc/icon.png",
-      "description": "Tiên Vực - repo kychi\n\nv14: add beta kéo xuống dưới để đổi domain",
+      "description": "Tiên Vực - repo kychi",
       "type": "novel",
       "locale": "vi_VN"
     }

@@ -1,10 +1,11 @@
-load('config.js')
+load('config.js');
+
 function execute() {
-    let response = fetch(BASE_URL+'/api/categories/all');
-    if (response.ok){
-        let allCate = response.json();
-        const data = [];
-        allCate.forEach(item => {
+    var response = fetch(BASE_URL + '/api/categories/all');
+    if (response.ok) {
+        var allCate = response.json();
+        var data = [];
+        allCate.forEach(function(item) {
             data.push({
                 title: item.name,
                 input: item.slug,
@@ -13,5 +14,5 @@ function execute() {
         });
         return Response.success(data);
     }
-    return null;
+    return Response.error("Không thể tải danh mục");
 }
