@@ -356,7 +356,28 @@
       "description": "Nghe truyện bằng Viettel AI Text-to-Speech. 16 giọng Bắc/Trung/Nam đa dạng.\n\nMIỄN PHÍ 50.000 ký tự tháng đầu, gia hạn 20K/50K ký tự mỗi tháng.\n\nHƯỚNG DẪN: Vào viettelai.vn → Đăng nhập → Dashboard/Token → Dán vào cài đặt extension.",
       "type": "tts",
       "locale": "vi_VN"
+    },
+    {
+      "name": "Web Truyện Dịch",
+      "author": "kychi",
+      "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-webtruyendich/plugin.zip",
+      "version": 1,
+      "source": "https://webtruyendich.com/",
+      "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-webtruyendich/icon.png",
+      "description": "Đọc truyện chữ Web Truyện Dịch online, cập nhật nhanh chóng với bản dịch chất lượng cao và AI.",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
+      "name": "Tiên Vực",
+      "author": "Nhocconsr",
+      "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/tienvuc/plugin.zip",
+      "version": 14,
+      "source": "https://tienvuc.top",
+      "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/tienvuc/icon.png",
+      "description": "Tiên Vực - repo kychi\n\nv14: add beta kéo xuống dưới để đổi domain",
+      "type": "novel",
+      "locale": "vi_VN"
     }
-    
       ]
 }

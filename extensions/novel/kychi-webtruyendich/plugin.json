@@ -1,0 +1,22 @@
+{
+    "metadata": {
+        "name": "Web Truyện Dịch",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://webtruyendich.com/",
+        "regexp": "^https://webtruyendich\\.com/truyen/.*",
+        "description": "Đọc truyện chữ Web Truyện Dịch online, cập nhật nhanh chóng với bản dịch chất lượng cao và AI. \n\nV1: chỉ load được vietphrase (convert)",
+        "locale": "vi_VN",
+        "type": "novel",
+        "language": "javascript"
+    },
+    "script": {
+        "home": "home.js",
+        "detail": "detail.js",
+        "toc": "toc.js",
+        "chap": "chap.js",
+        "page": "page.js",
+        "search": "search.js",
+        "genre": "genre.js"
+    }
+}

@@ -286,5 +286,49 @@
       "language": "javascript",
       "type": "novel"
     }
+  },
+  {
+    "folder": "kychi-webtruyendich",
+    "name": "Web Truyện Dịch",
+    "author": "kychi",
+    "description": "Đọc truyện chữ Web Truyện Dịch online, cập nhật nhanh chóng với bản dịch chất lượng cao và AI.",
+    "source": "https://webtruyendich.com/",
+    "version": 1,
+    "type": "novel",
+    "locale": "vi_VN",
+    "relativePath": "extensions/novel/kychi-webtruyendich",
+    "metadata": {
+      "name": "Web Truyện Dịch",
+      "author": "kychi",
+      "version": 1,
+      "source": "https://webtruyendich.com/",
+      "regexp": "^https://webtruyendich\\.com/truyen/.*",
+      "description": "Đọc truyện chữ Web Truyện Dịch online, cập nhật nhanh chóng với bản dịch chất lượng cao và AI.",
+      "locale": "vi_VN",
+      "type": "novel",
+      "language": "javascript"
+    }
+  },
+  {
+    "folder": "tienvuc",
+    "name": "Tiên Vực",
+    "author": "Nhocconsr",
+    "description": "Tiên Vực - repo kychi\n\nv14: add beta kéo xuống dưới để đổi domain",
+    "source": "https://tienvuc.top",
+    "version": 14,
+    "type": "novel",
+    "locale": "vi_VN",
+    "relativePath": "extensions/novel/tienvuc",
+    "metadata": {
+      "name": "Tiên Vực",
+      "author": "Nhocconsr",
+      "version": 14,
+      "source": "https://tienvuc.top",
+      "regexp": "^https?://(www\\.)?tienvuc\\.[^/]+/[a-z0-9-]+",
+      "description": "Tiên Vực - repo kychi\n\nv14: add beta kéo xuống dưới để đổi domain",
+      "locale": "vi_VN",
+      "language": "javascript",
+      "type": "novel"
+    }
   }
 ]

@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "name": "Tiên Vực",
+    "author": "Nhocconsr",
+    "version": 14,
+    "source": "https://tienvuc.top",
+    "regexp": "^https?://(www\\.)?tienvuc\\.[^/]+/[a-z0-9-]+",
+    "description": "Tiên Vực- repo kychi\n\n v14: add beta kéo xuống dưới để đổi domain",
+    "locale": "vi_VN",
+    "language": "javascript",
+    "type": "novel"
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
+  },
+  "config":{
+    "CONFIG_URL": {
+      "title": "Đổi domain",
+      "description": "Nhập URL mới nếu domain mặc định bị chặn hoặc đổi.",
+      "mode": "input",
+      "default": ""
+    }
+    
+  }
+}
