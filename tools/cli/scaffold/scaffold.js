@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline/promises');
 
-const ALLOWED_TYPES = ['novel', 'comic', 'chinese_novel', 'translate', 'tts'];
+const ALLOWED_TYPES = ['novel', 'comic', 'video', 'audio', 'chinese_novel', 'translate', 'tts'];
 const ALLOWED_LOCALES = ['vi_VN', 'zh_CN', 'en_US'];
 
 function slugifyName(name) {
@@ -63,23 +63,33 @@ async function askIfMissing(config, key, prompt, fallback = '') {
     }
 }
 
+function resolveDefaultTemplateDir(workspaceRoot, type) {
+    const rootTemplate = path.join(workspaceRoot, 'templates', type);
+    if (fs.existsSync(rootTemplate)) return rootTemplate;
+    const skillTemplate = path.join(workspaceRoot, '.claude', 'skills', 'vbook-extensions', 'templates', type);
+    if (fs.existsSync(skillTemplate)) return skillTemplate;
+    return path.join(workspaceRoot, 'code-reference', '_unknown', 'example');
+}
+
 function parseAndNormalizeOptions(workspaceRoot, options = {}) {
     const source = ensureUrl(options.source);
     const name = String(options.name || '').trim();
-    const folderName = options.folder
-        ? slugifyName(options.folder)
-        : slugifyName(name);
     const type = String(options.type || 'novel').trim();
     const locale = String(options.locale || 'vi_VN').trim();
+    const author = String(options.author || process.env.VBOOK_AUTHOR || 'kychi').trim();
+
+    const rawSlug = slugifyName(name).replace(/-/g, '_');
+    const authorPrefix = `${slugifyName(author)}_`;
+    const defaultFolder = rawSlug.startsWith(authorPrefix) ? rawSlug : `${authorPrefix}${rawSlug}`;
+    const folderName = options.folder ? slugifyName(options.folder) : defaultFolder;
 
     const templateDir = path.resolve(
-        options.template || path.join(workspaceRoot, 'code-reference', '_unknown', 'example')
+        options.template || resolveDefaultTemplateDir(workspaceRoot, type)
     );
 
     const outputDir = path.resolve(
         options.output || path.join(workspaceRoot, 'extensions', type, folderName)
     );
-    const author = String(options.author || process.env.VBOOK_AUTHOR || 'kychi').trim();
     const description = String(options.description || `Generated extension for ${source}`).trim();
     const regexp = String(options.regexp || buildDefaultRegexp(source)).trim();
 

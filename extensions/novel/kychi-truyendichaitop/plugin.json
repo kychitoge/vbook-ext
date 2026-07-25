@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "name": "Truyện Dịch AI",
+    "author": "kychi",
+    "version": 1,
+    "source": "https://truyendichai.top/",
+    "regexp": "(?:www\\.)?truyendichai\\.top/.*",
+    "description": "Đọc truyện chữ dịch AI chất lượng cao tại TruyenDichAI.top",
+    "locale": "vi_VN",
+    "type": "novel",
+    "language": "javascript"
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "search": "search.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Tên miền",
+      "subtitle": "Chọn hoặc nhập tên miền",
+      "default": "https://truyendichai.top",
+      "mode": "input",
+      "format": "text"
+    }
+  }
+}

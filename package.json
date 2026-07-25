@@ -8,6 +8,11 @@
     "vbook": "./tools/cli/index.js"
   },
   "scripts": {
+    "vbook": "node .claude/skills/vbook-extensions/scripts/vbook.js",
+    "vbook:connect": "node .claude/skills/vbook-extensions/scripts/vbook.js connect",
+    "vbook:test": "node .claude/skills/vbook-extensions/scripts/vbook.js test",
+    "vbook:install": "node .claude/skills/vbook-extensions/scripts/vbook.js install",
+    "vbook:build": "node .claude/skills/vbook-extensions/scripts/vbook.js build",
     "ext:create": "node tools/cli/index.js ext --mode create",
     "ext:edit": "node tools/cli/index.js ext --mode edit --plugin extensions/novel/kychi_ntruyen/plugin.json --dry-run",
     "ext:create:dry": "node tools/cli/index.js ext --mode create --name DemoExt --source https://example.com --author kychi --dry-run",

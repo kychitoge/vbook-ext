@@ -1,6 +1,6 @@
 # 🤖 Bản mẫu Hướng dẫn Agent viết Extension (Prompt Template)
 
-Tài liệu này là bản mẫu (template) chuẩn hóa bằng Tiếng Việt để gửi trực tiếp cho các AI Agent khác khi giao nhiệm vụ phát triển hoặc chỉnh sửa một Extension VBook mới.
+Tài liệu này là bản mẫu (template) chuẩn hóa bằng Tiếng Việt để gửi trực tiếp cho các AI Agent khác khi giao nhiệm vụ tạo mới, sửa lỗi, test hoặc refactor một Extension VBook.
 
 ---
 
@@ -12,16 +12,21 @@ Tài liệu này là bản mẫu (template) chuẩn hóa bằng Tiếng Việt �
 ---
 
 ### 1. Các nguyên tắc tối cao bắt buộc tuân thủ:
-* **Không tự ý thực hiện các hành động sau** (Trừ khi được yêu cầu rõ ràng):
-  - Không tự động đóng gói ZIP (`build:ext`).
-  - Không tự động cài đặt payload lên thiết bị (`install`).
-  - Không tự động commit hoặc push code lên GitHub.
-* **Không chỉnh sửa trực tiếp** các tệp tin danh mục tổng hợp được tạo tự động: `extensions/plugin.json` hoặc `extensions/{loại}/plugin.json`.
 * **Luôn đọc kỹ tài liệu trước khi lập trình**:
-  - Hướng dẫn lập trình tổng quan: [docs/EXTENSION_DEVELOPMENT_GUIDE.md](file:///d:/My%20Code/vbook-tool/docs/EXTENSION_DEVELOPMENT_GUIDE.md)
-  - Hướng dẫn tra cứu hàm: [docs/JSBRIDGE_REFERENCE.md](file:///d:/My%20Code/vbook-tool/docs/JSBRIDGE_REFERENCE.md)
-* **Đảm bảo thu thập đầy đủ dữ liệu**: Khảo sát DOM của trang web nguồn, hiểu rõ cấu trúc dữ liệu mong muốn trước khi viết bất kỳ hàm phân tích nào.
-* **Không sử dụng cú pháp ES6+**: Chỉ sử dụng cú pháp tương thích môi trường Rhino (ES5), bắt buộc dùng `var` thay thế hoàn toàn cho `let` và `const`, không dùng hàm mũi tên hoặc async/await.
+  - Hợp đồng API chính thức (Master Spec): [docs/extension-api.md](./extension-api.md)
+  - Checklist kiểm tra dữ liệu: [docs/verify-checklist.md](./verify-checklist.md)
+  - Master Skill Specification: [.claude/skills/vbook-extensions/SKILL.md](../.claude/skills/vbook-extensions/SKILL.md)
+* **Quy tắc Môi trường Rhino (ES6 Safe Subset)**:
+  - CẤM VI PHẠM: Cấm khai báo biến trùng tên với key trong `plugin.json.config` (`let DOMAIN = ...` / `const DOMAIN = ...`), vì App tự động tiêm key dưới dạng `const KEY = "..."` trước khi script thực thi. Dùng `load('config.js')` và `BASE_URL`.
+  - LUÔN kiểm tra `if (!response.ok)` trước khi gọi `.html()`, `.json()`, `.text()`.
+  - TRÁNH: KHÔNG dùng `async/await`, `Promise`, optional chaining `?.`, nullish coalescing `??`, object/array spread (`{...obj}`), `Array.prototype.flat`, numeric separators.
+* **Quy trình Khởi tạo & Kiểm thử**:
+  - Dùng lệnh CLI để tạo khung: `npm run ext:create -- --name <Tên> --source <URL> --type <novel|comic|video|audio|tts|translate>`. Không tự tạo folder bằng tay.
+  - Chạy test trực tiếp qua REST-API: `npm run vbook:test -- <ext-folder> <script.js> [args...]`.
+  - Đóng gói & đồng bộ catalog: `npm run vbook:build -- <ext-folder>` và `npm run build:catalog`.
+* **Quy định bảo vệ dữ liệu**:
+  - Không tự ý commit/push code lên Git khi chưa được xác nhận.
+  - Không sửa các file `plugin.json` tổng hợp ở gốc bằng tay.
 
 ---
 
@@ -29,12 +34,13 @@ Tài liệu này là bản mẫu (template) chuẩn hóa bằng Tiếng Việt �
 
 * **Tên Extension**: `[Nhập tên hiển thị tại đây]`
 * **Trang web nguồn (Source URL)**: `[Nhập URL trang nguồn tại đây]`
-* **Thể loại Extension (Type)**: `[novel | comic | video | translate | tts]`
+* **Thể loại Extension (Type)**: `[novel | comic | video | audio | tts | translate]`
 * **Các lưu ý đặc thù**:
-  - `[Ghi chú thêm về cấu trúc trang, quảng cáo cần chặn, hoặc cơ chế mã hóa cần vượt qua nếu có]`
+  - `[Ghi chú thêm về cấu trúc trang, selector DOM, hoặc cơ chế mã hóa nếu có]`
 
 ---
 
 ### 3. Tài liệu & Code tham khảo:
-* Tham khảo cấu trúc của các extension cùng thể loại đã chạy ổn định trong thư mục: `extensions/[Thể_loại]/`
-* Tham khảo tài liệu thiết kế giải mã nội dung nâng cao (nếu trang web áp dụng mã hóa chống cào dữ liệu): [docs/DECRYPTION_PATTERNS.md](file:///d:/My%20Code/vbook-tool/docs/DECRYPTION_PATTERNS.md)
+* Bộ mẫu starter code chuẩn admin: `templates/[novel|comic|video|tts|translate]/`
+* Các extension đang hoạt động cùng thể loại trong: `extensions/[loại]/`
+* Hướng dẫn giải mã chống cào dữ liệu: [docs/DECRYPTION_PATTERNS.md](./DECRYPTION_PATTERNS.md)

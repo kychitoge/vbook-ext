@@ -6,7 +6,7 @@ function handleVerifyCommand(options, workspaceRoot) {
     const extRoot = path.join(workspaceRoot, 'extensions');
     const catalogPluginPath = path.join(extRoot, 'plugin.json');
     const rootPluginPath = path.join(workspaceRoot, 'plugin.json');
-    const types = ['novel', 'comic', 'chinese_novel', 'translate', 'tts'];
+    const types = ['novel', 'comic', 'video', 'audio', 'chinese_novel', 'translate', 'tts'];
     
     console.log('\nVBook Project Verification');
     console.log('========================');

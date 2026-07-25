@@ -41,28 +41,25 @@ VBOOK_AUTHOR=tên_của_bạn     # Tên tác giả hiển thị mặc định t
 
 ### Bước 1: Tạo mới Extension thông qua CLI
 ```bash
-npm run ext:create -- --name MyExtension --source https://example.com
+npm run ext:create -- --name MyExtension --source https://example.com --type novel
 ```
 * > [!WARNING]
-  > **Không tạo thư mục bằng tay**. Sử dụng CLI để sinh khung dữ liệu chuẩn xác nhất.
+  > **Không tạo thư mục bằng tay**. Sử dụng CLI để sinh khung dữ liệu chuẩn xác nhất từ `templates/{type}`.
 
 ### Bước 2: Lập trình Mã nguồn
-* Tham khảo hướng dẫn [docs/EXTENSION_DEVELOPMENT_GUIDE.md](file:///d:/My%20Code/vbook-tool/docs/EXTENSION_DEVELOPMENT_GUIDE.md) để viết mã nguồn đúng chuẩn Rhino (ES5).
+* Tham khảo hướng dẫn [docs/extension-api.md](./extension-api.md), [docs/EXTENSION_DEVELOPMENT_GUIDE.md](./EXTENSION_DEVELOPMENT_GUIDE.md) và [.claude/skills/vbook-extensions/SKILL.md](../.claude/skills/vbook-extensions/SKILL.md) để viết mã nguồn đúng chuẩn Rhino ES6 safe subset.
 
-### Bước 3: Đóng gói tệp ZIP
+### Bước 3: Kiểm thử Trực tiếp trên App
 ```bash
-npm run build:ext -- --plugin extensions/novel/my_ext
+npm run vbook:test -- extensions/novel/my_ext detail.js https://example.com/item/123
 ```
-* Tạo ra tệp `plugin.zip` sẵn sàng cài đặt.
+* Đối chiếu kết quả với [docs/verify-checklist.md](./verify-checklist.md).
 
-### Bước 4: Tái tạo danh mục tổng (Bắt buộc)
+### Bước 4: Đóng gói tệp ZIP & Tái tạo danh mục tổng (Bắt buộc)
 ```bash
+npm run vbook:build -- extensions/novel/my_ext
 npm run build:catalog
 ```
-* Cập nhật danh sách catalog tổng hợp tại `extensions/plugin.json` để App/Viewer nhận diện được extension mới của bạn.
-
-### Bước 5: Kiểm tra xác thực (Verify)
-* Kiểm thử bằng VSCode Tester hoặc chạy local server để cài đặt trực tiếp lên app vBook qua địa chỉ IP đã cấu hình trong `.env`.
 
 ---
 
@@ -72,7 +69,8 @@ Trước khi thực hiện commit mã nguồn hoặc tạo Pull Request, vui lò
 
 - [ ] **Lệnh CLI**: Thư mục extension và metadata được tạo/chỉnh sửa thông qua CLI.
 - [ ] **Không chỉnh sửa catalog bằng tay**: Không chỉnh sửa trực tiếp các file `plugin.json` tổng hợp ở gốc.
-- [ ] **Quy tắc Rhino**: Không chứa bất kỳ cú pháp ES6+ nào (không dùng `let`, `const`, `arrow function`, `async/await`).
+- [ ] **Quy tắc Rhino ES6 Safe**: Không dùng `async/await`, `?.`, `??`, `{...spread}`, `Array.flat`. Không khai báo biến trùng key `plugin.json.config` (như `let DOMAIN = ...`).
+- [ ] **Kiểm tra `response.ok`**: Luôn kiểm tra `if (!response.ok)` trước khi parse DOM/JSON.
 - [ ] **Đóng gói ZIP**: Extension đã được chạy lệnh build ra tệp tin `plugin.zip` thành công.
 - [ ] **Catalog Rebuilt**: Đã chạy lệnh `npm run build:catalog` và có thay đổi trong danh mục tổng.
 - [ ] **Dọn dẹp log**: Không commit các tệp tin log sinh ra từ `tools/cli/reports/` lên git.

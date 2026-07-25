@@ -33,6 +33,25 @@ program
     .description('VBook CLI - Tools for extension developers (v3 Modular)')
     .version('3.0.0');
 
+program.command('connect')
+    .description('Connect and probe local VBook REST-API server')
+    .option('--server <url>', 'VBook server URL')
+    .action(() => {
+        const { fork } = require('child_process');
+        fork(path.join(__dirname, 'vbook.js'), process.argv.slice(2), { stdio: 'inherit' });
+    });
+
+program.command('test')
+    .description('Test an extension script via official REST-API server')
+    .argument('<ext-dir>', 'Extension directory')
+    .argument('<script>', 'Script file name (e.g. detail.js)')
+    .argument('[args...]', 'Arguments passed to execute()')
+    .option('--server <url>', 'VBook server URL')
+    .action(() => {
+        const { fork } = require('child_process');
+        fork(path.join(__dirname, 'vbook.js'), process.argv.slice(2), { stdio: 'inherit' });
+    });
+
 program.command('ext')
     .description('Tao moi hoac sua metadata extension')
     .option('--mode <mode>', 'create|edit', 'create')

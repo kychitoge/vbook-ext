@@ -3,7 +3,7 @@ const path = require('path');
 
 function buildCatalog(workspaceRoot) {
     const extRoot = path.join(workspaceRoot, 'extensions');
-    const types = ['novel', 'comic', 'chinese_novel', 'translate', 'tts', 'video'];
+    const types = ['novel', 'comic', 'video', 'audio', 'chinese_novel', 'translate', 'tts'];
     
     function safeReadJson(filePath) {
         try {
@@ -45,6 +45,7 @@ function buildCatalog(workspaceRoot) {
                 .sort((a, b) => a.localeCompare(b));
             entries = names.map(name => buildEntry(type, name)).filter(Boolean);
         }
+        fs.mkdirSync(typeDir, { recursive: true });
         fs.writeFileSync(path.join(typeDir, 'plugin.json'), JSON.stringify(entries, null, 2) + '\n', 'utf8');
         rootCatalog[type] = entries;
         builtInfo.push({

@@ -23,16 +23,16 @@ async function handleValidateCommand(options, workspaceRoot) {
         const code = fs.readFileSync(filePath, 'utf8');
         console.log(`\nChecking ${file}...`);
 
-        // 1. AST Validation for ES5/Rhino compatibility
+        // 1. AST Validation for Rhino ES6 Safe Mode
         try {
-            acorn.parse(code, { ecmaVersion: file === 'config.js' ? 6 : 5 });
-            console.log(`  ✓ Syntax: ${file === 'config.js' ? 'ES6 (for let BASE_URL)' : 'ES5'} compatible.`);
+            acorn.parse(code, { ecmaVersion: 2020 });
+            console.log(`  ✓ Syntax: Valid JavaScript syntax.`);
         } catch (err) {
-            console.warn(`  ✗ Syntax Error (ES5 incompatible at ${err.loc.line}:${err.loc.column}): ${err.message}`);
+            console.warn(`  ✗ Syntax Error at ${err.loc.line}:${err.loc.column}: ${err.message}`);
             overallSuccess = false;
         }
 
-        // 2. VBook API Pattern Checks
+        // 2. VBook API Pattern & Constraint Checks
         if (file !== 'config.js') {
             if (!code.includes('function execute')) {
                 console.warn(`  ✗ Missing 'function execute(...)' entry point.`);
@@ -40,15 +40,36 @@ async function handleValidateCommand(options, workspaceRoot) {
             } else {
                 console.log(`  ✓ Found 'execute' function.`);
             }
+
+            // Check response.ok
+            if ((code.includes('.html()') || code.includes('.json()') || code.includes('.text()')) && !code.includes('.ok')) {
+                console.warn(`  ! Warning: Calling .html()/.json()/.text() without checking 'response.ok'.`);
+            }
         }
 
-        if (code.includes('const ') || (file !== 'config.js' && code.includes('let '))) {
-            console.warn(`  ! Warning: 'const/let' detected. Ensure your Rhino runtime supports them.`);
+        // Check for forbidden re-declaration of DOMAIN or config keys
+        if (/(?:let|const|var)\s+DOMAIN\s*=/i.test(code)) {
+            console.warn(`  ✗ Forbidden: Declaring 'DOMAIN' variable. DOMAIN is injected by Host App. Use load('config.js') and BASE_URL.`);
+            overallSuccess = false;
+        }
+
+        // Check for async/await or unsupported features
+        if (/\b(async|await)\b/.test(code)) {
+            console.warn(`  ✗ Unsupported on Rhino: 'async/await' keyword detected.`);
+            overallSuccess = false;
+        }
+        if (/\?\./.test(code)) {
+            console.warn(`  ✗ Unsupported on Rhino: Optional chaining '?.' detected.`);
+            overallSuccess = false;
+        }
+        if (/\?\?/.test(code)) {
+            console.warn(`  ✗ Unsupported on Rhino: Nullish coalescing '??' detected.`);
+            overallSuccess = false;
         }
     }
 
     if (overallSuccess) {
-        console.log('\n[SUCCESS] Extension is valid and ready for VBook.');
+        console.log('\n[SUCCESS] Extension is valid and compliant with VBook Rhino ES6 Safe Mode.');
     } else {
         console.warn('\n[ISSUE] Validation failed. Please fix the items above.');
     }

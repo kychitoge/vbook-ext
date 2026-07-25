@@ -49,19 +49,19 @@
       "folder": "kychi_ntruyen",
       "name": "nTruyen",
       "author": "kychi",
-      "description": "Đọc truyện từ ntruyen.xyz (fork của B)",
-      "source": "https://ntruyen.xyz/",
-      "version": 9,
+      "description": "Đọc truyện từ sstruyen (ntruyen cũ) \n\n kéo xuống để đổi domain",
+      "source": "https://sstruyen.lat/",
+      "version": 11,
       "type": "novel",
       "locale": "vi_VN",
       "relativePath": "extensions/novel/kychi_ntruyen",
       "metadata": {
         "name": "nTruyen",
         "author": "kychi",
-        "version": 9,
-        "source": "https://ntruyen.xyz/",
-        "regexp": "(www.)?ntruyen.xyz/[^/]+/?$",
-        "description": "Đọc truyện từ ntruyen.xyz (fork của B)",
+        "version": 11,
+        "source": "https://sstruyen.lat/",
+        "regexp": "https?:\\/\\/(www\\.)?sstruyen\\.[a-z0-9.-]+\\/truyen\\/[^\\/]+\\/?",
+        "description": "Đọc truyện từ sstruyen (ntruyen cũ) \n\n kéo xuống để đổi domain",
         "locale": "vi_VN",
         "language": "javascript",
         "type": "novel"
@@ -160,19 +160,19 @@
       "folder": "kychi_truyentv",
       "name": "TruyenTv",
       "author": "kychi",
-      "description": "Đọc truyện từ TruyenTv.\n\n⚙️ TÙY CHỈNH DOMAIN:\nTrang này rất hay đổi domain. Nếu link chết, vào Setting của ext nhập URL mới vào ô bên dưới — không cần chờ update code.\n\nVD: https://www.tvtruyen.xyz",
-      "source": "https://www.tvtruyen.site/",
-      "version": 5,
+      "description": "Đọc truyện từ TruyenTv (www.tvtruyen.cc).\n\nv7: Bổ sung tab Lưu ý bật VPN 1.1.1.1.\n\n⚙️ TÙY CHỈNH DOMAIN:\nTrang này hay đổi domain. Nếu link chết, kéo xuống dưới nhập URL mới vào ô bên dưới (VD: https://www.tvtruyen.cc)",
+      "source": "https://www.tvtruyen.cc/",
+      "version": 7,
       "type": "novel",
       "locale": "vi_VN",
       "relativePath": "extensions/novel/kychi_truyentv",
       "metadata": {
         "name": "TruyenTv",
         "author": "kychi",
-        "version": 5,
-        "source": "https://www.tvtruyen.site/",
-        "regexp": "(www\\.)?tvtruyen\\.(site|us|net|com|vn|io|tv|me|top|online|xyz|info|cc|lol|gg)/.*",
-        "description": "Đọc truyện từ TruyenTv.\n\n⚙️ TÙY CHỈNH DOMAIN:\nTrang này rất hay đổi domain. Nếu link chết, vào Setting của ext nhập URL mới vào ô bên dưới — không cần chờ update code.\n\nVD: https://www.tvtruyen.xyz",
+        "version": 7,
+        "source": "https://www.tvtruyen.cc/",
+        "regexp": "(https?:\\/\\/)?(www\\.)?tvtruyen\\.[a-z]{2,}\\/[^/]+$",
+        "description": "Đọc truyện từ TruyenTv (www.tvtruyen.cc).\n\nv7: Bổ sung tab Lưu ý bật VPN 1.1.1.1.\n\n⚙️ TÙY CHỈNH DOMAIN:\nTrang này hay đổi domain. Nếu link chết, kéo xuống dưới nhập URL mới vào ô bên dưới (VD: https://www.tvtruyen.cc)",
         "locale": "vi_VN",
         "language": "javascript",
         "type": "novel"
@@ -245,6 +245,72 @@
       }
     },
     {
+      "folder": "kychi-truyendichaitop",
+      "name": "Truyện Dịch AI",
+      "author": "kychi",
+      "description": "Đọc truyện chữ dịch AI chất lượng cao tại TruyenDichAI.top",
+      "source": "https://truyendichai.top/",
+      "version": 1,
+      "type": "novel",
+      "locale": "vi_VN",
+      "relativePath": "extensions/novel/kychi-truyendichaitop",
+      "metadata": {
+        "name": "Truyện Dịch AI",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://truyendichai.top/",
+        "regexp": "(?:www\\.)?truyendichai\\.top/.*",
+        "description": "Đọc truyện chữ dịch AI chất lượng cao tại TruyenDichAI.top",
+        "locale": "vi_VN",
+        "type": "novel",
+        "language": "javascript"
+      }
+    },
+    {
+      "folder": "kychi-webtruyendich",
+      "name": "Web Truyện Dịch",
+      "author": "kychi",
+      "description": "Đọc truyện chữ Web Truyện Dịch online, cập nhật nhanh chóng với bản dịch chất lượng cao và AI. \n\nV1: chỉ load được vietphrase (convert)",
+      "source": "https://webtruyendich.com/",
+      "version": 1,
+      "type": "novel",
+      "locale": "vi_VN",
+      "relativePath": "extensions/novel/kychi-webtruyendich",
+      "metadata": {
+        "name": "Web Truyện Dịch",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://webtruyendich.com/",
+        "regexp": "^https://webtruyendich\\.com/truyen/.*",
+        "description": "Đọc truyện chữ Web Truyện Dịch online, cập nhật nhanh chóng với bản dịch chất lượng cao và AI. \n\nV1: chỉ load được vietphrase (convert)",
+        "locale": "vi_VN",
+        "type": "novel",
+        "language": "javascript"
+      }
+    },
+    {
+      "folder": "tienvuc",
+      "name": "Tiên Vực",
+      "author": "Nhocconsr",
+      "description": "Tiên Vực - repo kychi\n\n v16: Nâng cấp detail & comment\n v15: fix crypto chap \n\n KÉO XUỐNG DƯỚI ĐỂ ĐỔI DOMAIN",
+      "source": "https://tienvuc.blog",
+      "version": 16,
+      "type": "novel",
+      "locale": "vi_VN",
+      "relativePath": "extensions/novel/tienvuc",
+      "metadata": {
+        "name": "Tiên Vực",
+        "author": "Nhocconsr",
+        "version": 16,
+        "source": "https://tienvuc.blog",
+        "regexp": "^https?://(www\\.)?tienvuc\\.[^/]+/[a-z0-9-]+",
+        "description": "Tiên Vực - repo kychi\n\n v16: Nâng cấp detail & comment\n v15: fix crypto chap \n\n KÉO XUỐNG DƯỚI ĐỂ ĐỔI DOMAIN",
+        "locale": "vi_VN",
+        "language": "javascript",
+        "type": "novel"
+      }
+    },
+    {
       "folder": "truyenhoan",
       "name": "Truyện Hoàn",
       "author": "kychi",
@@ -290,183 +356,6 @@
     }
   ],
   "comic": [],
-  "chinese_novel": [
-    {
-      "folder": "kychi_cachua",
-      "name": "Cà Chua Sói Xám",
-      "author": "kychi",
-      "description": "Nguồn truyện chữ Trung Quốc từ Fanqie Novel (sói xám to version)- chỉ đọc không tải (Ngoại trừ VIP/SVIP).\n\n⚠️ Giới hạn đọc: 3 chương/ngày dành cho khách ẩn danh.\n\n Cách để đọc tiếp:\n➊ Mở Trình duyệt ngay trong app vBook.\n➋ Truy cập: https://v2.czyl.cf/login\n➌ Đăng nhập tài khoản Sói Xám.\n➍ Quay lại và Làm mới chương.\n\n🔗 Hướng dẫn: https://discord.com/channels/607084896288243731/1476830093996327097",
-      "source": "https://fanqienovel.com",
-      "version": 3,
-      "type": "chinese_novel",
-      "locale": "zh_CN",
-      "relativePath": "extensions/chinese_novel/kychi_cachua",
-      "metadata": {
-        "name": "Cà Chua Sói Xám",
-        "author": "kychi",
-        "version": 3,
-        "source": "https://fanqienovel.com",
-        "regexp": "fanqienovel\\.com/page/[a-zA-Z0-9_-]+",
-        "description": "Nguồn truyện chữ Trung Quốc từ Fanqie Novel (sói xám to version)- chỉ đọc không tải (Ngoại trừ VIP/SVIP).\n\n⚠️ Giới hạn đọc: 3 chương/ngày dành cho khách ẩn danh.\n\n Cách để đọc tiếp:\n➊ Mở Trình duyệt ngay trong app vBook.\n➋ Truy cập: https://v2.czyl.cf/login\n➌ Đăng nhập tài khoản Sói Xám.\n➍ Quay lại và Làm mới chương.\n\n🔗 Hướng dẫn: https://discord.com/channels/607084896288243731/1476830093996327097",
-        "locale": "zh_CN",
-        "type": "chinese_novel",
-        "language": "javascript"
-      }
-    },
-    {
-      "folder": "kychi_cachua_c3",
-      "name": "Cà Chua C3",
-      "author": "kychi",
-      "description": "Nguồn truyện chữ Trung Quốc từ Fanqie Novel, sử dụng thuật toán xGorgon cục bộ và tự động lấy Session.",
-      "source": "https://fanqienovel.com",
-      "version": 1,
-      "type": "chinese_novel",
-      "locale": "zh_CN",
-      "relativePath": "extensions/chinese_novel/kychi_cachua_c3",
-      "metadata": {
-        "name": "Cà Chua C3",
-        "author": "kychi",
-        "version": 1,
-        "source": "https://fanqienovel.com",
-        "regexp": "fanqienovel\\.com/[^/]+/?$",
-        "description": "Nguồn truyện chữ Trung Quốc từ Fanqie Novel, sử dụng thuật toán xGorgon cục bộ và tự động lấy Session.",
-        "locale": "zh_CN",
-        "type": "chinese_novel",
-        "language": "javascript"
-      }
-    },
-    {
-      "folder": "kychi_html5qq",
-      "name": "[QQ] html5",
-      "author": "kychi",
-      "description": "QQ浏览器小说接口书源",
-      "source": "https://novel.html5.qq.com",
-      "version": 1,
-      "type": "chinese_novel",
-      "locale": "zh_CN",
-      "relativePath": "extensions/chinese_novel/kychi_html5qq",
-      "metadata": {
-        "name": "[QQ] html5",
-        "author": "kychi",
-        "version": 1,
-        "source": "https://novel.html5.qq.com",
-        "regexp": "novel\\.html5\\.qq\\.com/.*|bookshelf\\.html5\\.qq\\.com/.*",
-        "description": "QQ浏览器小说接口书源",
-        "locale": "zh_CN",
-        "type": "chinese_novel",
-        "language": "javascript"
-      }
-    },
-    {
-      "folder": "kychi_novelcooks",
-      "name": "NovelCooks",
-      "author": "kychi",
-      "description": "nguồn truyện cà chua, search đểu cực kì + trạng thái hoàn thành điêu",
-      "source": "https://novel.cooks.tw",
-      "version": 1,
-      "type": "chinese_novel",
-      "locale": "zh_CN",
-      "relativePath": "extensions/chinese_novel/kychi_novelcooks",
-      "metadata": {
-        "name": "NovelCooks",
-        "author": "kychi",
-        "version": 1,
-        "source": "https://novel.cooks.tw",
-        "regexp": "novel\\.cooks\\.tw/novel\\.html\\?.*articleid=\\d+.*",
-        "description": "nguồn truyện cà chua, search đểu cực kì + trạng thái hoàn thành điêu",
-        "locale": "zh_CN",
-        "type": "chinese_novel",
-        "language": "javascript"
-      }
-    },
-    {
-      "folder": "kychi-cachua-c2",
-      "name": "[Fanqie] Cà Chua C2",
-      "author": "kychi",
-      "description": "Nguồn truyện chữ từ Fanqie Novel (番茄小说). Dùng proxy mirror để đọc nội dung.",
-      "source": "https://fanqienovel.com",
-      "version": 2,
-      "type": "chinese_novel",
-      "locale": "zh_CN",
-      "relativePath": "extensions/chinese_novel/kychi-cachua-c2",
-      "metadata": {
-        "name": "[Fanqie] Cà Chua C2",
-        "author": "kychi",
-        "version": 2,
-        "source": "https://fanqienovel.com",
-        "regexp": "fanqienovel\\.com/page/[0-9]+",
-        "description": "Nguồn truyện chữ từ Fanqie Novel (番茄小说). Dùng proxy mirror để đọc nội dung.",
-        "locale": "zh_CN",
-        "type": "chinese_novel",
-        "language": "javascript"
-      }
-    },
-    {
-      "folder": "snapd",
-      "name": "Snapd",
-      "author": "kychi",
-      "description": "Tiện ích đọc truyện chữ từ m.snapd.net (笔趣阁)",
-      "source": "https://m.snapd.net",
-      "version": 1,
-      "type": "chinese_novel",
-      "locale": "zh_CN",
-      "relativePath": "extensions/chinese_novel/snapd",
-      "metadata": {
-        "name": "Snapd",
-        "author": "kychi",
-        "version": 1,
-        "source": "https://m.snapd.net",
-        "regexp": "(?:m\\\\.snapd\\\\.net\\\\/read|bqg\\\\w+\\\\.\\\\w+\\\\/(?:#\\\\/)?book)\\\\/\\\\d+",
-        "description": "Tiện ích đọc truyện chữ từ m.snapd.net (笔趣阁)",
-        "locale": "zh_CN",
-        "language": "javascript",
-        "type": "chinese_novel"
-      }
-    }
-  ],
-  "translate": [],
-  "tts": [
-    {
-      "folder": "fpt_ai_tts",
-      "name": "FPT AI TTS",
-      "author": "kychi",
-      "description": "Nghe truyện bằng FPT AI Text-to-Speech. Hỗ trợ giọng Bắc/Trung/Nam.\n\n FREE 100.000 KÍ TỰ/THÁNG/project. Một acc có thể có nhiều project\n\nHƯỚNG DẪN LẤY API KEY:\n\n 1. Vào trang nguồn đăng nhập\n 2. Tạo project + tạo api key \n 3. copy api key dán vào cấu hình ext ",
-      "source": "https://console.fpt.ai/",
-      "version": 1,
-      "type": "tts",
-      "locale": "vi_VN",
-      "relativePath": "extensions/tts/fpt_ai_tts",
-      "metadata": {
-        "name": "FPT AI TTS",
-        "author": "kychi",
-        "version": 1,
-        "source": "https://console.fpt.ai/",
-        "description": "Nghe truyện bằng FPT AI Text-to-Speech. Hỗ trợ giọng Bắc/Trung/Nam.\n\n FREE 100.000 KÍ TỰ/THÁNG/project. Một acc có thể có nhiều project\n\nHƯỚNG DẪN LẤY API KEY:\n\n 1. Vào trang nguồn đăng nhập\n 2. Tạo project + tạo api key \n 3. copy api key dán vào cấu hình ext ",
-        "type": "tts",
-        "locale": "vi_VN"
-      }
-    },
-    {
-      "folder": "viettelai_tts",
-      "name": "Viettel AI TTS",
-      "author": "kychi",
-      "description": "Nghe truyện bằng Viettel AI Text-to-Speech. 16 giọng Bắc/Trung/Nam đa dạng.\n\nMIỄN PHÍ 50.000 ký tự tháng đầu, gia hạn 20K/50K ký tự mỗi tháng.\n\nHƯỚNG DẪN: Vào trang nguồn → Đăng nhập → Vào Dashboard/Token → Copy token dán vào cài đặt ext.",
-      "source": "https://viettelai.vn/dashboard/token",
-      "version": 1,
-      "type": "tts",
-      "locale": "vi_VN",
-      "relativePath": "extensions/tts/viettelai_tts",
-      "metadata": {
-        "name": "Viettel AI TTS",
-        "author": "kychi",
-        "version": 1,
-        "source": "https://viettelai.vn/dashboard/token",
-        "description": "Nghe truyện bằng Viettel AI Text-to-Speech. 16 giọng Bắc/Trung/Nam đa dạng.\n\nMIỄN PHÍ 50.000 ký tự tháng đầu, gia hạn 20K/50K ký tự mỗi tháng.\n\nHƯỚNG DẪN: Vào trang nguồn → Đăng nhập → Vào Dashboard/Token → Copy token dán vào cài đặt ext.",
-        "type": "tts",
-        "locale": "vi_VN"
-      }
-    }
-  ],
   "video": [
     {
       "folder": "kychi_animehay",
@@ -706,6 +595,140 @@
         "locale": "vi_VN",
         "type": "video",
         "language": "javascript"
+      }
+    }
+  ],
+  "audio": [],
+  "chinese_novel": [
+    {
+      "folder": "kychi_cachua",
+      "name": "Cà Chua Sói Xám",
+      "author": "kychi",
+      "description": "Nguồn truyện chữ Trung Quốc từ Fanqie Novel (sói xám to version)- chỉ đọc không tải (Ngoại trừ VIP/SVIP).\n\n⚠️ Giới hạn đọc: 3 chương/ngày dành cho khách ẩn danh.\n\n Cách để đọc tiếp:\n➊ Mở Trình duyệt ngay trong app vBook.\n➋ Truy cập: https://v2.czyl.cf/login\n➌ Đăng nhập tài khoản Sói Xám.\n➍ Quay lại và Làm mới chương.\n\n🔗 Hướng dẫn: https://discord.com/channels/607084896288243731/1476830093996327097",
+      "source": "https://fanqienovel.com",
+      "version": 3,
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "relativePath": "extensions/chinese_novel/kychi_cachua",
+      "metadata": {
+        "name": "Cà Chua Sói Xám",
+        "author": "kychi",
+        "version": 3,
+        "source": "https://fanqienovel.com",
+        "regexp": "fanqienovel\\.com/page/[a-zA-Z0-9_-]+",
+        "description": "Nguồn truyện chữ Trung Quốc từ Fanqie Novel (sói xám to version)- chỉ đọc không tải (Ngoại trừ VIP/SVIP).\n\n⚠️ Giới hạn đọc: 3 chương/ngày dành cho khách ẩn danh.\n\n Cách để đọc tiếp:\n➊ Mở Trình duyệt ngay trong app vBook.\n➋ Truy cập: https://v2.czyl.cf/login\n➌ Đăng nhập tài khoản Sói Xám.\n➍ Quay lại và Làm mới chương.\n\n🔗 Hướng dẫn: https://discord.com/channels/607084896288243731/1476830093996327097",
+        "locale": "zh_CN",
+        "type": "chinese_novel",
+        "language": "javascript"
+      }
+    },
+    {
+      "folder": "kychi_html5qq",
+      "name": "[QQ] html5",
+      "author": "kychi",
+      "description": "QQ浏览器小说接口书源",
+      "source": "https://novel.html5.qq.com",
+      "version": 1,
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "relativePath": "extensions/chinese_novel/kychi_html5qq",
+      "metadata": {
+        "name": "[QQ] html5",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://novel.html5.qq.com",
+        "regexp": "novel\\.html5\\.qq\\.com/.*|bookshelf\\.html5\\.qq\\.com/.*",
+        "description": "QQ浏览器小说接口书源",
+        "locale": "zh_CN",
+        "type": "chinese_novel",
+        "language": "javascript"
+      }
+    },
+    {
+      "folder": "kychi_novelcooks",
+      "name": "NovelCooks",
+      "author": "kychi",
+      "description": "nguồn truyện cà chua, search đểu cực kì + trạng thái hoàn thành điêu",
+      "source": "https://novel.cooks.tw",
+      "version": 1,
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "relativePath": "extensions/chinese_novel/kychi_novelcooks",
+      "metadata": {
+        "name": "NovelCooks",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://novel.cooks.tw",
+        "regexp": "novel\\.cooks\\.tw/novel\\.html\\?.*articleid=\\d+.*",
+        "description": "nguồn truyện cà chua, search đểu cực kì + trạng thái hoàn thành điêu",
+        "locale": "zh_CN",
+        "type": "chinese_novel",
+        "language": "javascript"
+      }
+    },
+    {
+      "folder": "kychi-cachua-c2",
+      "name": "[Fanqie] Cà Chua C2",
+      "author": "kychi",
+      "description": "Nguồn truyện chữ từ Fanqie Novel (番茄小说). Dùng proxy mirror để đọc nội dung.\n\nLỌC GIỚI TÍNH\n(beta kéo ngay xuống dưới)\n\n-1=All\n1=Nam\n0=Nữ",
+      "source": "https://fanqienovel.com",
+      "version": 3,
+      "type": "chinese_novel",
+      "locale": "zh_CN",
+      "relativePath": "extensions/chinese_novel/kychi-cachua-c2",
+      "metadata": {
+        "name": "[Fanqie] Cà Chua C2",
+        "author": "kychi",
+        "version": 3,
+        "source": "https://fanqienovel.com",
+        "regexp": "fanqienovel\\.com/page/[0-9]+",
+        "description": "Nguồn truyện chữ từ Fanqie Novel (番茄小说). Dùng proxy mirror để đọc nội dung.\n\nLỌC GIỚI TÍNH\n(beta kéo ngay xuống dưới)\n\n-1=All\n1=Nam\n0=Nữ",
+        "locale": "zh_CN",
+        "type": "chinese_novel",
+        "language": "javascript"
+      }
+    }
+  ],
+  "translate": [],
+  "tts": [
+    {
+      "folder": "fpt_ai_tts",
+      "name": "FPT AI TTS",
+      "author": "kychi",
+      "description": "Nghe truyện bằng FPT AI Text-to-Speech. Hỗ trợ giọng Bắc/Trung/Nam.\n\n FREE 100.000 KÍ TỰ/THÁNG/project. Một acc có thể có nhiều project\n\nHƯỚNG DẪN LẤY API KEY:\n\n 1. Vào trang nguồn đăng nhập\n 2. Tạo project + tạo api key \n 3. copy api key dán vào cấu hình ext ",
+      "source": "https://console.fpt.ai/",
+      "version": 1,
+      "type": "tts",
+      "locale": "vi_VN",
+      "relativePath": "extensions/tts/fpt_ai_tts",
+      "metadata": {
+        "name": "FPT AI TTS",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://console.fpt.ai/",
+        "description": "Nghe truyện bằng FPT AI Text-to-Speech. Hỗ trợ giọng Bắc/Trung/Nam.\n\n FREE 100.000 KÍ TỰ/THÁNG/project. Một acc có thể có nhiều project\n\nHƯỚNG DẪN LẤY API KEY:\n\n 1. Vào trang nguồn đăng nhập\n 2. Tạo project + tạo api key \n 3. copy api key dán vào cấu hình ext ",
+        "type": "tts",
+        "locale": "vi_VN"
+      }
+    },
+    {
+      "folder": "viettelai_tts",
+      "name": "Viettel AI TTS",
+      "author": "kychi",
+      "description": "Nghe truyện bằng Viettel AI Text-to-Speech. 16 giọng Bắc/Trung/Nam đa dạng.\n\nMIỄN PHÍ 50.000 ký tự tháng đầu, gia hạn 20K/50K ký tự mỗi tháng.\n\nHƯỚNG DẪN: Vào trang nguồn → Đăng nhập → Vào Dashboard/Token → Copy token dán vào cài đặt ext.",
+      "source": "https://viettelai.vn/dashboard/token",
+      "version": 1,
+      "type": "tts",
+      "locale": "vi_VN",
+      "relativePath": "extensions/tts/viettelai_tts",
+      "metadata": {
+        "name": "Viettel AI TTS",
+        "author": "kychi",
+        "version": 1,
+        "source": "https://viettelai.vn/dashboard/token",
+        "description": "Nghe truyện bằng Viettel AI Text-to-Speech. 16 giọng Bắc/Trung/Nam đa dạng.\n\nMIỄN PHÍ 50.000 ký tự tháng đầu, gia hạn 20K/50K ký tự mỗi tháng.\n\nHƯỚNG DẪN: Vào trang nguồn → Đăng nhập → Vào Dashboard/Token → Copy token dán vào cài đặt ext.",
+        "type": "tts",
+        "locale": "vi_VN"
       }
     }
   ]

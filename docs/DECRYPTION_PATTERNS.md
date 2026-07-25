@@ -7,7 +7,7 @@ Tài liệu tri thức này tổng hợp các mô hình bảo mật dữ liệu 
 ## ⚠️ Phân biệt Quan trọng
 > [!WARNING]
 > Tài liệu này nói về việc **Giải mã dữ liệu của website đích** (để lấy nội dung truyện/ảnh/phim).
-> Để tìm hiểu cách **Mã hóa bảo vệ code JavaScript của Extension**, vui lòng xem: [SOURCE_OBFUSCATION_GUIDE.md](file:///d:/My%20Code/vbook-tool/docs/SOURCE_OBFUSCATION_GUIDE.md).
+> Để tìm hiểu cách **Mã hóa bảo vệ code JavaScript của Extension**, vui lòng xem: [SOURCE_OBFUSCATION_GUIDE.md](./SOURCE_OBFUSCATION_GUIDE.md).
 
 ---
 

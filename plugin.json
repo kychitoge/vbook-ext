@@ -378,6 +378,17 @@
       "description": "Tiên Vực - repo kychi",
       "type": "novel",
       "locale": "vi_VN"
+    },
+    {
+      "name": "Truyện Dịch AI",
+      "author": "kychi",
+      "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-truyendichaitop/plugin.zip",
+      "version": 1,
+      "source": "https://truyendichai.top/",
+      "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-truyendichaitop/icon.png",
+      "description": "Đọc truyện chữ dịch AI chất lượng cao tại TruyenDichAI.top",
+      "type": "novel",
+      "locale": "vi_VN"
     }
-      ]
+  ]
 }

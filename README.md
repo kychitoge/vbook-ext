@@ -37,6 +37,7 @@ https://raw.githubusercontent.com/kychitoge/vbook-ext/main/plugin.json
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_medoctruyen/icon.png" width="40"> | **Mê Đọc Truyện** | [medoctruyen.vn](https://medoctruyen.vn) | 1 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-audiotruyenfull/icon.png" width="40"> | **Audio Truyện Full** | [audiotruyenfull.org](https://audiotruyenfull.org/) | 1 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-webtruyendich/icon.png" width="40"> | **Web Truyện Dịch** (kychi) | [webtruyendich.com](https://webtruyendich.com/) | 1 | novel | vi_VN |
+| <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-truyendichaitop/icon.png" width="40"> | **Truyện Dịch AI** | [truyendichai.top](https://truyendichai.top/) | 1 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/tienvuc/icon.png" width="40"> | **Tiên Vực** (Nhocconsr) | [tienvuc.top](https://tienvuc.blog) | 16 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_vbook_docs/icon.png" width="40"> | **Hướng dẫn sử dụng VBook** | [vbookapp.gitbook.io](https://vbookapp.gitbook.io/huong-dan-su-dung) | 6 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/video/kychi_hhhtq/icon.png" width="40"> | **HHHTQ** | [hhhtq.team](https://hhhtq.team) | 2 | video | vi_VN |
@@ -70,3 +71,33 @@ Nếu bạn là người dùng mới, hãy tham khảo hướng dẫn chi tiết
 
 Khám phá thêm các extension khác được chia sẻ bởi cộng đồng vBook:
 [vBookExt.me - Tổng hợp nguồn vBook](https://www.vbookext.me/)
+
+---
+
+### 🛠️ 5. Công cụ phát triển Extension (Developer Tools)
+
+Bộ công cụ chính thức từ Admin vBook & Repo Tooling:
+
+* **Tài liệu API chuẩn**: [docs/extension-api.md](./docs/extension-api.md)
+* **Checklist kiểm tra**: [docs/verify-checklist.md](./docs/verify-checklist.md)
+* **Master Skill Spec**: [.claude/skills/vbook-extensions/SKILL.md](.claude/skills/vbook-extensions/SKILL.md)
+
+#### Lệnh CLI chính:
+```bash
+# Khởi tạo extension mới từ template chuẩn admin
+npm run ext:create -- --name "Tên Extension" --source "https://domain.com" --type novel
+
+# Test script trực tiếp với VBook app REST-API server
+node .claude/skills/vbook-extensions/scripts/vbook.js test <ext-folder> <script.js> [args...]
+# hoặc
+npm run vbook:test -- <ext-folder> <script.js> [args...]
+
+# Cài đặt extension trực tiếp vào VBook app
+npm run vbook:install -- <ext-folder>
+
+# Đóng gói file ZIP plugin
+npm run vbook:build -- <ext-folder>
+
+# Cập nhật lại catalog tổng trước khi commit
+npm run build:catalog
+```

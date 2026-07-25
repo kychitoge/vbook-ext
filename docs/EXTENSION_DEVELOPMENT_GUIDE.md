@@ -2,6 +2,8 @@
 
 Tài liệu này là cẩm nang hướng dẫn toàn diện dành cho Developer và AI Agent khi tham gia xây dựng hoặc bảo trì các extension (tiện ích bổ sung) trong hệ sinh thái ứng dụng vBook.
 
+> 📌 **Lưu ý**: Tài liệu Hợp đồng Chi tiết và chính thức từ Admin vBook được lưu tại: [docs/extension-api.md](./extension-api.md) và Quy trình Kiểm tra tại [docs/verify-checklist.md](./verify-checklist.md).
+
 ---
 
 ## 🚀 1. Quy trình Phát triển Bắt buộc (Workflow Contract)
@@ -9,14 +11,14 @@ Tài liệu này là cẩm nang hướng dẫn toàn diện dành cho Developer 
 Mọi hoạt động phát triển extension phải tuân thủ nghiêm ngặt quy trình 5 bước khép kín sau:
 
 ```text
-🔎 Nghiên cứu (Research) ──> 🛠️ Khởi tạo (Scaffold) ──> 💻 Lập trình (Implement) ──> 📦 Đóng gói (Build) ──> 🔄 Đồng bộ (Catalog Sync)
+🔎 Nghiên cứu (Research) ──> 🛠️ Khởi tạo (Scaffold) ──> 💻 Lập trình (Implement) ──> ⚡ Kiểm thử (Test) ──> 📦 Đóng gói & Đồng bộ
 ```
 
 1. **Nghiên cứu (Research)**: Khảo sát trực tiếp cấu trúc HTML DOM hoặc các yêu cầu mạng (XHR/Fetch) trên trang web nguồn bằng DevTools của trình duyệt trước khi viết code.
-2. **Khởi tạo (Scaffold)**: Sử dụng lệnh CLI `npm run ext:create` để khởi tạo cấu trúc thư mục tự động. **Không tự tạo thư mục thủ công**.
-3. **Lập trình (Implement)**: Viết mã nguồn trong thư mục `src/` tuân thủ các quy tắc về môi trường chạy (Rhino Runtime) và Hợp đồng Script (Script Contract).
-4. **Đóng gói (Build)**: Thực hiện đóng gói mã nguồn thành tệp `plugin.zip` bằng lệnh `npm run build:ext -- --plugin <path>`.
-5. **Đồng bộ (Catalog Sync)**: Luôn cập nhật chỉ mục tổng bằng lệnh `npm run build:catalog` trước khi thực hiện commit lên Git.
+2. **Khởi tạo (Scaffold)**: Sử dụng lệnh CLI `npm run ext:create -- --name <Tên> --source <URL> --type <novel|comic|video|audio|tts|translate>` để tự động tạo cấu trúc từ bộ mẫu chuẩn admin trong `templates/{type}/`.
+3. **Lập trình (Implement)**: Viết mã nguồn trong thư mục `src/` tuân thủ các quy tắc môi trường thực thực (Rhino ES6 Safe Mode) và Hợp đồng Script trong `docs/extension-api.md`.
+4. **Kiểm thử (Test)**: Chạy test trực tiếp với VBook REST-API server bằng lệnh `npm run vbook:test -- <ext-folder> <script.js> [args...]`.
+5. **Đóng gói & Đồng bộ (Build & Catalog Sync)**: Đóng gói bằng `npm run vbook:build -- <ext-folder>` và đồng bộ chỉ mục tổng bằng `npm run build:catalog` trước khi commit.
 
 ---
 
@@ -25,41 +27,50 @@ Mọi hoạt động phát triển extension phải tuân thủ nghiêm ngặt q
 Một extension VBook tiêu chuẩn bắt buộc phải được đặt trong thư mục `extensions/{thể_loại}/{tác_giả}_{tên_nguồn}/` với cấu trúc như sau:
 
 ```text
-extensions/{loại_truyện}/{author}_{name}/
+extensions/{loại}/{author}_{name}/
 ├── plugin.json          # Tệp cấu hình Metadata (chỉ sửa qua CLI hoặc khi thật sự cần thiết)
-├── icon.png             # Icon hiển thị của nguồn (Kích thước khuyên dùng: 64x64 hoặc 128x128 pixel)
+├── icon.png             # Icon hiển thị của nguồn (Kích thước: 200x200 pixel)
 └── src/
-    ├── config.js        # Cấu hình các hằng số, tiện ích dùng chung (được nạp tự động đầu tiên)
-    ├── home.js          # Trang chủ / Danh sách tiêu biểu
-    ├── genre.js         # (Tùy chọn) Danh mục các thể loại truyện
-    ├── search.js        # Logic tìm kiếm truyện/phim
-    ├── detail.js        # Logic phân tích trang thông tin chi tiết truyện/phim
-    ├── toc.js           # Logic phân tích danh sách tập/chương (Table of Contents)
-    ├── chap.js          # Logic lấy nội dung chương (Novel/Comic) hoặc Server Picker (Video)
-    └── track.js         # (Chỉ dành cho Video) Logic trích xuất link stream video (.m3u8, .mp4)
+    ├── config.js        # Khai báo BASE_URL và normalizeUrl(url)
+    ├── home.js          # Trang chủ / Tabs danh sách tiêu biểu
+    ├── explore.js       # (Tùy chọn) Trang khám phá phân mục
+    ├── genre.js         # (Tùy chọn) Danh mục thể loại truyện / phim
+    ├── search.js        # Logic tìm kiếm
+    ├── detail.js        # Logic phân tích thông tin chi tiết
+    ├── toc.js           # Logic phân tích danh sách tập/chương (TOC)
+    ├── chap.js          # Logic lấy nội dung chương (Novel) hoặc danh sách Server (Video/Audio)
+    ├── page.js          # (Thay thế chap.js cho Comic) Danh sách link ảnh chương
+    ├── track.js         # (Chỉ dành cho Video/Audio) Resolution link stream (.m3u8, .mp4)
+    ├── voice.js / tts.js# (Dành cho loại TTS) Danh sách giọng đọc & tổng hợp âm thanh
+    └── language.js / translate.js # (Dành cho loại Translate) Danh sách ngôn ngữ & dịch thuật
 ```
 
 ---
 
-## ⚡ 3. Ràng buộc Môi trường Rhino Runtime (ES5 Only)
+## ⚡ 3. Ràng buộc Môi trường Rhino Runtime (ES6 Safe Mode)
 
-Bộ nhân thực thi JavaScript trong ứng dụng vBook là **Rhino Engine** (chạy trên máy ảo Java của Android), **KHÔNG PHẢI là Node.js**. Do đó, cú pháp được hỗ trợ giới hạn ở chuẩn **ES5 cổ điển**.
+Bộ nhân thực thi JavaScript trong ứng dụng vBook là **Rhino 1.8.1 (ES6 Safe Subset)** running on Java Context `Context.VERSION_ES6`.
 
 ### ✅ Các cú pháp ĐƯỢC PHÉP dùng:
-* Khai báo biến bằng từ khóa: `var` (không dùng `let`, `const`).
-* Khai báo hàm truyền thống: `function name() {}`.
-* Các vòng lặp và câu lệnh rẽ nhánh: `if/else`, `for`, `while`, `try/catch`.
-* Các hàm xử lý mảng cơ bản: `Array.forEach()`, `Array.map()`, `Array.filter()`, `Array.sort()`.
-* Biểu thức chính quy (Regex), phân tích JSON (`JSON.parse`, `JSON.stringify`).
-* Cơ chế nạp thư viện nội bộ: `load("tên_file.js")` (thường dùng để tải `config.js` hoặc `crypto.js`).
+* Khai báo biến `let`, `const`, `var` (Lưu ý quy tắc cấm khai báo trùng key config bên dưới).
+* Hàm `function`, vòng lặp `if/else`, `for`, `while`, `try/catch`.
+* Các hàm mảng ES5/ES6 chuẩn: `forEach`, `map`, `filter`, `sort`, `reduce`.
+* Regex, `JSON.parse`, `JSON.stringify`.
+* Nạp thư viện nội bộ: `load("config.js")` (Lưu ý: `load` không đệ quy).
 
-### ❌ Các cú pháp TUYỆT ĐỐI CẤM dùng (Sẽ gây lỗi biên dịch hoặc sập ứng dụng):
-* Không dùng từ khóa khai báo biến hiện đại: `let`, `const`.
-* Không dùng hàm mũi tên: `(arg) => {}`.
-* Không dùng cú pháp bất đồng bộ: `async/await`, `Promise`.
-* Không dùng toán tử tùy chọn (Optional Chaining): `?.` hoặc toán tử gán null: `??`.
-* Không dùng cú pháp import/export mô-đun: `import`, `export`, `require`.
-* Không dùng cú pháp Class phức tạp của ES6+.
+### ❌ Các quy tắc TUYỆT ĐỐI KHÔNG DÙNG & CẤM VI PHẠM:
+1. **CẤM khai báo biến trùng tên với key trong `plugin.json.config`**:
+   Mọi key trong config (như `DOMAIN`) đều được App tự động tiêm dưới dạng `const DOMAIN = "..."` trước khi script chạy. Khai báo lại (`let DOMAIN = ...`) sẽ gây lỗi **SyntaxError** hỏng toàn bộ script.
+   👉 *Cách dùng chuẩn*: Khai báo `let BASE_URL = "https://...";` trong `config.js` rồi gán đè trong `try { if (typeof DOMAIN !== "undefined" && DOMAIN) BASE_URL = DOMAIN; } catch(e){}`.
+2. **LUÔN KIỂM TRA `response.ok`**:
+   Hàm `fetch()` không throw error khi gặp HTTP 40x/50x. Không bao giờ gọi `.html()`, `.json()`, `.text()` trước khi check `if (!response.ok) return Response.error("HTTP " + response.status);`.
+3. **CÁC CÚ PHÁP CẤM DÙNG TRÊN RHINO**:
+   - KHÔNG dùng `async/await`, `Promise`.
+   - KHÔNG dùng Optional Chaining `?.` hoặc Nullish Coalescing `??`.
+   - KHÔNG dùng Object/Array Spread (`{...obj}`).
+   - KHÔNG dùng `Array.prototype.flat`/`flatMap`.
+   - KHÔNG dùng import/export module.
+   - KHÔNG gọi trực tiếp Java Reflection (`java.*`, `Packages.*`).
 
 ---
 
@@ -99,14 +110,10 @@ function cleanText(text) {
     return text.replace(/\s+/g, " ").trim();
 }
 
-var Response = {
-    success: function(data, data2) {
-        return JSON.stringify({ code: 0, data: data, data2: data2 });
-    },
-    error: function(data) {
-        return JSON.stringify({ code: 1, data: data });
-    }
-};
+/**
+ * LƯU Ý: Đối tượng `Response` (Response.success / Response.error) 
+ * được tích hợp sẵn từ môi trường Host của vBook (không khai báo lại).
+ */
 
 /**
  * Kiểm tra kích thước an toàn cho Elements hoặc Mảng trong môi trường Rhino
@@ -193,8 +200,8 @@ load('config.js');
 function execute() {
     // Trả về danh sách các đầu mục tiêu biểu để App hiển thị
     var categories = [
-        { title: "Truyện Mới Cập Nhật", input: "/latest", script: "gen.js" },
-        { title: "Truyện Xem Nhiều", input: "/hot", script: "gen.js" }
+        { title: "Truyện Mới Cập Nhật", input: "/latest", script: "genre.js" },
+        { title: "Truyện Xem Nhiều", input: "/hot", script: "genre.js" }
     ];
     return Response.success(categories);
 }
@@ -204,33 +211,31 @@ function execute() {
 ```javascript
 load('config.js');
 
-function execute(input) {
-    var keyword = input[0];
-    var page = input[1] || 1;
-    
-    var searchUrl = BASE_URL + "/search?q=" + encodeURIComponent(keyword) + "&page=" + page;
+function execute(query, page) {
+    page = page || "1";
+    var searchUrl = BASE_URL + "/search?q=" + encodeURIComponent(query) + "&page=" + page;
     var response = fetch(searchUrl);
     
-    if (!response.ok) return Response.success([]);
+    if (!response.ok) return Response.error("HTTP " + response.status);
     
     var doc = response.html();
     var results = [];
     
     doc.select(".result-item").forEach(function(el) {
         results.push({
-            id: el.select("a").first().attr("href"),
-            title: cleanText(el.select(".title").text()),
+            name: cleanText(el.select(".title").text()),
+            link: normalizeUrl(el.select("a").first().attr("href")),
             cover: el.select("img").first().attr("src"),
-            desc: cleanText(el.select(".desc").text()),
-            link: normalizeUrl(el.select("a").first().attr("href"))
+            description: cleanText(el.select(".desc").text()),
+            host: BASE_URL
         });
     });
     
     var next = null;
     var nextEl = doc.select(".next-page").first();
-    if (nextEl) next = page + 1; // Hoặc đường dẫn cụ thể
+    if (nextEl) next = String(parseInt(page, 10) + 1);
     
-    return Response.success(results, next ? String(next) : null);
+    return Response.success(results, next || "");
 }
 ```
 
@@ -242,7 +247,7 @@ function execute(url) {
     url = normalizeUrl(url);
     var response = fetch(url);
     
-    if (!response.ok) return Response.error("Không thể tải thông tin truyện");
+    if (!response.ok) return Response.error("Không thể tải thông tin truyện: " + response.status);
     
     var doc = response.html();
     
@@ -252,14 +257,13 @@ function execute(url) {
     });
     
     return Response.success({
-        id: url,
-        title: cleanText(doc.select("h1.book-title").text()),
+        name: cleanText(doc.select("h1.book-title").text()),
         cover: doc.select(".book-cover img").first().attr("src"),
         author: cleanText(doc.select(".book-author").text()),
         description: cleanText(doc.select(".book-summary").html()),
         genres: genres,
         status: cleanText(doc.select(".book-status").text()),
-        link: url
+        host: BASE_URL
     });
 }
 ```
@@ -272,7 +276,7 @@ function execute(url) {
     url = normalizeUrl(url);
     var response = fetch(url);
     
-    if (!response.ok) return Response.success([]);
+    if (!response.ok) return Response.error("Không thể tải TOC: " + response.status);
     
     var doc = response.html();
     var chapters = [];
@@ -297,7 +301,7 @@ function execute(url) {
     url = normalizeUrl(url);
     var response = fetch(url);
     
-    if (!response.ok) return Response.error("Không thể tải nội dung chương");
+    if (!response.ok) return Response.error("Không thể tải nội dung chương: " + response.status);
     
     var doc = response.html();
     
@@ -319,11 +323,12 @@ function execute(url) {
 
 Khi extension gặp lỗi hoặc chạy không đúng mong đợi trên ứng dụng, hãy kiểm tra danh sách sau:
 
-- [ ] **Lỗi cú pháp Rhino**: Kiểm tra xem code có vô tình chứa `let`, `const`, `arrow function` hay `async/await` không.
+- [ ] **Lỗi cú pháp trùng key config**: Đảm bảo KHÔNG khai báo `let DOMAIN` hay `const DOMAIN` vì App tự tiêm `DOMAIN`.
+- [ ] **Lỗi kiểm tra HTTP**: Đảm bảo luôn kiểm tra `if (!response.ok)` trước khi gọi `.html()`, `.json()`, `.text()`.
 - [ ] **Lỗi tải nạp config**: Tất cả các file script (trừ `config.js`) phải bắt đầu bằng lệnh `load('config.js')`.
 - [ ] **Lỗi parse HTML**: Do giao diện website nguồn thay đổi CSS Selector. Hãy kiểm tra lại class/id trên trang web.
-- [ ] **Lỗi Next Page**: Hãy đảm bảo biến `next` trả về từ `search.js` là một **chuỗi ký tự (String)**, không truyền dạng số (Number) trực tiếp.
-- [ ] **Lỗi Đóng gói ZIP**: Thư mục extension bắt buộc phải chứa file `plugin.json` ở cấp cao nhất cùng thư mục `src/` và ảnh `icon.png` (nếu có).
+- [ ] **Lỗi Next Page**: Hãy đảm bảo biến `next` (data2) trả về từ `search.js` là một **chuỗi ký tự (String)** hoặc `""` (không dùng null hay số).
+- [ ] **Lỗi Đóng gói ZIP**: Thư mục extension bắt buộc phải chứa file `plugin.json` ở cấp cao nhất cùng thư mục `src/` và ảnh `icon.png`.
 
 ---
 
@@ -335,37 +340,32 @@ Khi extension gặp lỗi hoặc chạy không đúng mong đợi trên ứng d�
 
 ---
 
-## 💡 8. Mẹo Lập trình Nâng cao từ Bản mẫu (Advanced Coding Tips)
+## 💡 8. Kỹ thuật Lập trình Nâng cao từ Starter Templates
 
-Dưới đây là các kỹ thuật lập trình nâng cao, được tối ưu hóa từ bộ bản mẫu chuẩn (`extensions/templates/`) giúp extension của bạn hoạt động thông minh và bền bỉ hơn.
+Dưới đây là các kỹ thuật lập trình nâng cao, được tối ưu hóa từ bộ bản mẫu chuẩn admin (`templates/{type}/`) giúp extension của bạn hoạt động thông minh và bền bỉ hơn.
 
-### A. Chuẩn hóa Domain linh hoạt (Dynamic Domain Normalization)
-Để đảm bảo script luôn trỏ đúng về địa chỉ cấu hình BASE_URL hiện tại (ngăn lỗi khi site đổi domain phụ hoặc redirect), hãy sử dụng biểu thức chính quy sau ở đầu các hàm `execute` để tự động thay thế phần host của URL đầu vào:
+### A. Cơ chế đè địa chỉ cấu hình động (`config.js`)
+Trong `config.js`, chúng ta khởi tạo `BASE_URL` mặc định, sau đó đè bằng `DOMAIN` (được App tiêm tự động) trong khối `try/catch`:
 ```javascript
-url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
-```
-
-### B. Mã hóa đường dẫn ảnh an toàn (Safe Image URL Encoding)
-Nhiều trang web chứa khoảng trắng hoặc ký tự Unicode trong đường dẫn ảnh bìa khiến trình phát của vBook không thể tải được. Hãy bọc logic xử lý ảnh bìa bằng cơ chế mã hóa thông minh sau:
-```javascript
+let BASE_URL = "https://example.com";
 try {
-    var urlObj = new URL(cover);
-    // Chỉ mã hóa (encode) từng phân đoạn pathname để giữ nguyên cấu trúc URL gốc
-    urlObj.pathname = urlObj.pathname
-        .split("/")
-        .map(function(p) { return encodeURIComponent(p); })
-        .join("/");
-    cover = urlObj.toString();
-} catch (e) {
-    // Fallback dự phòng nếu URL bị sai định dạng thô
-    cover = encodeURI(cover);
+    if (typeof DOMAIN !== "undefined" && DOMAIN) {
+        BASE_URL = DOMAIN;
+    }
+} catch (e) {}
+```
+> [!IMPORTANT]
+> Không bao giờ khai báo `let DOMAIN = ...` hoặc `const DOMAIN = ...` vì App tiêm `const DOMAIN` sẵn trước khi script chạy. Khai báo trùng gây `SyntaxError`.
+
+### B. Chuẩn hóa URL trang nguồn (`normalizeUrl`)
+Hàm `normalizeUrl` trong `config.js` dùng để thay thế host của URL truyền vào bằng `BASE_URL` hiện tại:
+```javascript
+function normalizeUrl(url) {
+    if (!url) return "";
+    url = String(url).trim();
+    return url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
 }
 ```
-
-### C. Cơ chế tiêm địa chỉ cấu hình động (`let BASE_URL`)
-> [!NOTE]
-> **Ngoại lệ về từ khóa `let`**: Trong tệp tin `config.js` của các bản mẫu, chúng ta bắt buộc sử dụng `let BASE_URL` thay thế cho `var` và tuyệt đối không dùng `const`.
-> Điều này hỗ trợ nhân chạy của ứng dụng vBook có thể thực hiện cơ chế tiêm động (inject) cấu hình địa chỉ thay thế `CONFIG_URL` thông qua môi trường mà không bị crash hệ thống.
 
 ### D. Xử lý ảnh trễ (Lazy-load Images) trong Comic Extension
 Khi bóc tách danh sách ảnh trong `chap.js` của Comic, nhiều trang web ẩn link ảnh thật dưới dạng thuộc tính `data-src` hoặc `data-lazy-src`. Bản mẫu Comic cung cấp bộ giải pháp duyệt và gán ngược cực kỳ tối ưu:

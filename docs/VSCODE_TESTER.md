@@ -50,15 +50,25 @@ The tester treats a folder as a valid extension if it contains:
 
 ---
 
-## 📝 Notes
+## 📝 CLI & Automation Equivalence
 
-* Ensure your local vBook API server is running before executing tests.
-* The tester sends the entire source code of the extension to the `/test` endpoint for server-side evaluation.
+If you prefer testing from the command line or CI/CD pipelines instead of the VS Code extension, use the official **VBook REST-API CLI**:
 
----
+```bash
+# Connect and probe device
+node .claude/skills/vbook-extensions/scripts/vbook.js connect
+
+# Run test directly
+node .claude/skills/vbook-extensions/scripts/vbook.js test <ext-dir> <script.js> [args...]
+
+# Install directly to connected app
+node .claude/skills/vbook-extensions/scripts/vbook.js install <ext-dir>
+```
 
 > [!TIP]
-> Use the **Remember Last Run** feature to quickly re-test logic after making small code changes. You don't have to re-enter your arguments every time!
+> Both the VS Code Tester extension and the `vbook.js` CLI communicate with the exact same vBook REST-API endpoints (`/extension/test`, `/extension/build`, `/extension/install`).
+
+---
 
 > [!IMPORTANT]
 > The extension requires a compatible vBook API server (local or remote) to process the `/extension/*` endpoints.

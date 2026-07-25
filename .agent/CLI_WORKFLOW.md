@@ -25,9 +25,9 @@ Bộ công cụ CLI được quản lý thông qua lệnh `vbook` hoặc các ph
 ### A. Quản lý Extension
 #### ➕ Tạo mới một extension
 ```bash
-npm run ext:create -- --name <Tên_Extension> --source <URL_Nguồn>
+npm run ext:create -- --name <Tên_Extension> --source <URL_Nguồn> --type <novel|comic|video|audio|tts|translate>
 ```
-* **Hoạt động**: Tự động sinh ra cấu trúc thư mục chuẩn tại `extensions/{loại}/{tác_giả}_{tên}` bao gồm `plugin.json` chứa metadata gốc và thư mục `src/` chứa các tệp mã nguồn JS trống.
+* **Hoạt động**: Tự động sinh ra cấu trúc thư mục chuẩn tại `extensions/{loại}/{tác_giả}_{tên}` lấy từ starter template chuẩn admin trong `templates/{type}` bao gồm `plugin.json` và thư mục `src/`.
 
 #### 📝 Chỉnh sửa Metadata của extension
 ```bash
@@ -35,7 +35,25 @@ npm run ext:edit -- --plugin <đường_dẫn_folder_ext> --description "Mô t�
 ```
 * **Hoạt động**: Chỉ cập nhật trường thông tin trong `plugin.json`, giữ nguyên các file mã nguồn và tài nguyên khác.
 
-### B. Đóng gói & Phát hành
+### B. Kiểm thử Trực tiếp trên App (Official Admin REST-API CLI)
+#### ⚡ Kết nối & Chạy Test Script
+```bash
+# Kiểm tra kết nối với VBook REST-API Server trên thiết bị
+npm run vbook:connect
+# hoặc: node .claude/skills/vbook-extensions/scripts/vbook.js connect
+
+# Test thử một script của extension (ví dụ detail.js, search.js, chap.js)
+npm run vbook:test -- <ext-folder> <script.js> [args...]
+# hoặc: node .claude/skills/vbook-extensions/scripts/vbook.js test <ext-folder> <script.js> [args...]
+
+# Cài đặt trực tiếp extension vào app VBook
+npm run vbook:install -- <ext-folder>
+
+# Đóng gói ZIP theo chuẩn admin
+npm run vbook:build -- <ext-folder> [out.zip]
+```
+
+### C. Đóng gói & Phát hành Local
 #### 📦 Đóng gói thành ZIP
 ```bash
 npm run build -- --plugin <đường_dẫn_folder_ext>
@@ -78,7 +96,7 @@ npm run sync:web-catalog
 - Sử dụng lệnh CLI `ext:create` để khởi tạo thư mục. **Tuyệt đối không tự tạo thư mục bằng tay** để tránh sai sót cấu trúc.
 
 ### Bước 3: Phát triển (Implement)
-- Viết mã nguồn trong thư mục `src/` tuân thủ nghiêm ngặt các hợp đồng API trong [docs/EXTENSION_DEVELOPMENT_GUIDE.md](file:///d:/My%20Code/vbook-tool/docs/EXTENSION_DEVELOPMENT_GUIDE.md).
+- Viết mã nguồn trong thư mục `src/` tuân thủ nghiêm ngặt các hợp đồng API trong [docs/EXTENSION_DEVELOPMENT_GUIDE.md](../docs/EXTENSION_DEVELOPMENT_GUIDE.md).
 
 ### Bước 4: Đóng gói (Build)
 - Chạy lệnh `npm run build` để đóng gói thành tệp ZIP hoàn chỉnh.

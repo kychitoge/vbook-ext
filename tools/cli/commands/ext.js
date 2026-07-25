@@ -12,9 +12,12 @@ async function handleExtCommand(options, workspaceRoot) {
         if (!interactiveConfig.template && interactiveConfig.fromReference) {
             interactiveConfig.template = interactiveConfig.fromReference;
         }
+        if (!interactiveConfig.author) {
+            interactiveConfig.author = process.env.VBOOK_AUTHOR || 'kychi';
+        }
         await askIfMissing(interactiveConfig, 'name', 'Extension name');
         await askIfMissing(interactiveConfig, 'source', 'Source URL (domain)');
-        await askIfMissing(interactiveConfig, 'author', 'Author', process.env.VBOOK_AUTHOR || 'kychi');
+        await askIfMissing(interactiveConfig, 'author', 'Author', 'kychi');
         result = scaffoldExtension(workspaceRoot, interactiveConfig);
     } else {
         result = updateExistingExtension(workspaceRoot, options);

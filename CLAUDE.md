@@ -74,21 +74,25 @@ This section merges VBook's codebase architecture and developer workflow instruc
 3. **Luôn luôn hỏi ý kiến xác nhận** của User trước khi commit hoặc push code lên GitHub.
 4. **Luôn luôn nâng version** trong `plugin.json` lên thêm 1 phiên bản trước khi chuẩn bị commit.
 
-### 💻 Core CLI Commands (Lệnh dòng lệnh chính)
-* **Khởi tạo extension**: `npm run ext:create -- --name <Tên_Extension> --source <URL_Nguồn>`
-* **Cập nhật metadata**: `npm run ext:edit -- --plugin <đường_dẫn_folder> --description "Mô tả"`
-* **Đóng gói ZIP**: `npm run build -- --plugin <đường_dẫn_folder>`
-* **Cập nhật catalog tổng**: `npm run build:catalog` (Bắt buộc chạy trước khi commit nếu có đổi extension)
-* **Đồng bộ catalog web**: `npm run sync:web-catalog` (Chỉ dùng cho phân vùng cộng đồng web)
+### 💻 Official Admin CLI Commands (Official REST-API CLI)
+* **Kết nối server app**: `node .claude/skills/vbook-extensions/scripts/vbook.js connect` (hoặc `npm run vbook:connect`)
+* **Chạy test script**: `node .claude/skills/vbook-extensions/scripts/vbook.js test <ext-folder> <script.js> [args...]`
+* **Cài đặt trực tiếp vào app**: `node .claude/skills/vbook-extensions/scripts/vbook.js install <ext-folder>`
+* **Đóng gói ZIP**: `node .claude/skills/vbook-extensions/scripts/vbook.js build <ext-folder> [out.zip]`
 
-### ⚠️ Rhino Runtime ES5 Constraints (Ràng buộc chạy script của App)
-Script của extension chạy trên môi trường **Rhino (ES5)**. 
-* **Được dùng**: `var`, `function`, regex, JSON, các hàm mảng ES5 (`forEach`, `map`, `filter`), `load("config.js")`.
-* **CẤM DÙNG**: `let`, `const`, arrow functions (`=>`), `async/await`, `Promise`, optional chaining (`?.`), nullish coalescing (`??`), import/export.
+### 💻 Local Tooling CLI Commands
+* **Khởi tạo extension**: `npm run ext:create -- --name <Tên_Extension> --source <URL_Nguồn>`
+* **Cập nhật catalog tổng**: `npm run build:catalog` (Bắt buộc chạy trước khi commit nếu có đổi extension)
+
+### ⚠️ JS Runtime Constraints (Rhino ES6 Safe Mode)
+Script extension chạy trên Rhino (ES6 safe subset).
+* **Tránh**: `async/await`, `?.`, `??`, `{...spread}`, `Array.flat`, numeric separators.
+* **Cấm**: Khai báo biến trùng tên với key trong `plugin.json.config` (ví dụ `let DOMAIN = ...` gây SyntaxError). Dùng `load('config.js')` và `BASE_URL`.
+* **Quy tắc quan trọng**: Luôn kiểm tra `response.ok` trước khi gọi `.html()`, `.json()`, `.text()`.
 
 ### 📚 Key Documentation Paths
-* **Master Dev Guide**: [docs/EXTENSION_DEVELOPMENT_GUIDE.md](file:///d:/My%20Code/vbook-tool/docs/EXTENSION_DEVELOPMENT_GUIDE.md)
-* **JSBridge & Crypto APIs**: [docs/JSBRIDGE_REFERENCE.md](file:///d:/My%20Code/vbook-tool/docs/JSBRIDGE_REFERENCE.md)
-* **Decryption Knowledge Base**: [docs/DECRYPTION_PATTERNS.md](file:///d:/My%20Code/vbook-tool/docs/DECRYPTION_PATTERNS.md)
-* **Source Protection (Obfuscation)**: [docs/SOURCE_OBFUSCATION_GUIDE.md](file:///d:/My%20Code/vbook-tool/docs/SOURCE_OBFUSCATION_GUIDE.md)
-* **Contributing Rules**: [docs/CONTRIBUTING.md](file:///d:/My%20Code/vbook-tool/docs/CONTRIBUTING.md)
+* **Official Extension API (Standard)**: [docs/extension-api.md](./docs/extension-api.md)
+* **Official Verification Checklist**: [docs/verify-checklist.md](./docs/verify-checklist.md)
+* **Skill Master Spec**: [.claude/skills/vbook-extensions/SKILL.md](.claude/skills/vbook-extensions/SKILL.md)
+* **Decryption Patterns**: [docs/DECRYPTION_PATTERNS.md](./docs/DECRYPTION_PATTERNS.md)
+* **Contributing Rules**: [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)
