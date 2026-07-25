@@ -1,23 +1,37 @@
 // config.js — TruyenTv Extension
-// Dùng let để VBook có thể inject CONFIG_URL khi cần (cả system lẫn user setting)
-let BASE_URL = "https://www.tvtruyen.site";
+var BASE_URL = "https://www.tvtruyen.cc";
 
 try { if (CONFIG_URL) BASE_URL = CONFIG_URL; } catch (e) {}
 
-var BASE_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+var BASE_UA = 'Mozilla/5.0 (Linux; Android 12; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36';
+
+if (typeof Response === 'undefined') {
+    var Response = {
+        success: function(data, data2) {
+            return JSON.stringify({ code: 0, data: data, data2: data2 });
+        },
+        error: function(data) {
+            return JSON.stringify({ code: 1, data: data });
+        }
+    };
+}
 
 function fetchPage(url, options) {
     if (!options) options = {};
     var headers = {
         'User-Agent': BASE_UA,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer': BASE_URL + '/'
     };
+
     if (options.headers) {
         for (var key in options.headers) {
             headers[key] = options.headers[key];
         }
     }
     options.headers = headers;
+
     return fetch(url, options);
 }
 
@@ -59,12 +73,3 @@ function cleanDescription(htm) {
         .replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '')
         .trim();
 }
-
-var Response = {
-    success: function(data, data2) {
-        return JSON.stringify({ code: 0, data: data, data2: data2 });
-    },
-    error: function(data) {
-        return JSON.stringify({ code: 1, data: data });
-    }
-};

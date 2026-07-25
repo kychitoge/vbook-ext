@@ -2,10 +2,10 @@
   "metadata": {
     "name": "nTruyen",
     "author": "kychi",
-    "version": 9,
-    "source": "https://ntruyen.xyz/",
-    "regexp": "(www.)?ntruyen.xyz/[^/]+/?$",
-    "description": "Đọc truyện từ ntruyen.xyz (fork của B)",
+    "version": 11,
+    "source": "https://sstruyen.lat/",
+    "regexp": "https?:\\/\\/(www\\.)?sstruyen\\.[a-z0-9.-]+\\/truyen\\/[^\\/]+\\/?",
+    "description": "Đọc truyện từ sstruyen (ntruyen cũ) \n\n kéo xuống để đổi domain",
     "locale": "vi_VN",
     "language": "javascript",
     "type": "novel"
@@ -18,5 +18,13 @@
     "search": "search.js",
     "toc": "toc.js",
     "chap": "chap.js"
+  },
+  "config": {
+    "CONFIG_URL": {
+      "title": "Đổi URL domain",
+      "description": "Nhập URL mới nếu domain mặc định bị chặn hoặc đổi.",
+      "mode": "input",
+      "default": ""
+    }
   }
 }

@@ -3,7 +3,7 @@ function execute(key, page) {
     var q = encodeURIComponent(key);
     var target = BASE_URL + '/tim-kiem?keyword=' + q;
     if (page && page !== '1') target += '&page=' + page;
-    var response = fetchPage(target);
+    var response = fetchWithFallback(target);
     if (response.ok) {
         var doc = response.html();
         var next = null;
@@ -28,6 +28,13 @@ function execute(key, page) {
                 host: BASE_URL
             });
         });
+        if (!next && data.length > 0) {
+            var disabledNext = doc.select("button[disabled] svg.lucide-arrow-right, button[disabled] .lucide-arrow-right").first();
+            if (!disabledNext) {
+                var currentPage = parseInt(page || '1', 10);
+                next = (currentPage + 1).toString();
+            }
+        }
         return Response.success(data, next);
     }
     return Response.error('HTTP Error: ' + response.status);

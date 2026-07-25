@@ -2,7 +2,7 @@ load('config.js');
 
 function execute(url) {
     url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
-    var response = fetchPage(url);
+    var response = fetchWithFallback(url);
     if (!response.ok) return Response.error('HTTP Error: ' + response.status);
 
     var doc = response.html();
@@ -53,17 +53,16 @@ function execute(url) {
                   lowerStatus.indexOf('full') === -1 &&
                   lowerStatus.indexOf('complete') === -1;
 
-    var detailParts = [];
-    detailParts.push('<p><strong>Tác giả:</strong> ' + author + '</p>');
-    detailParts.push('<p><strong>Trạng thái:</strong> ' + statusText + '</p>');
-    if (chapterCount) detailParts.push('<p><strong>Số chương:</strong> ' + chapterCount + '</p>');
-    if (genreTexts.length > 0) detailParts.push('<p><strong>Thể loại:</strong> ' + genreTexts.join(', ') + '</p>');
-
     var genres = [];
     var firstGenreUrl = '';
-    doc.select("header[itemtype='https://schema.org/Book'] a[itemprop='genre']").forEach(function(e) {
-        var title = e.text();
+    var seenGenre = {};
+    doc.select('a[itemprop="genre"], a[href*="/the-loai/"]').forEach(function(e) {
+        var title = e.text().trim();
         var href = e.attr('href') || '';
+        if (!title || !href || href === '/the-loai/tat-ca' || title === 'Thể loại' || title === 'Xem thêm') return;
+        if (seenGenre[href]) return;
+        seenGenre[href] = true;
+
         genres.push({
             title: title,
             input: href,
@@ -73,6 +72,18 @@ function execute(url) {
             firstGenreUrl = href;
         }
     });
+
+    if (genreTexts.length === 0 && genres.length > 0) {
+        genres.forEach(function(g) {
+            genreTexts.push(g.title);
+        });
+    }
+
+    var detailParts = [];
+    detailParts.push('<p><strong>Tác giả:</strong> ' + author + '</p>');
+    detailParts.push('<p><strong>Trạng thái:</strong> ' + statusText + '</p>');
+    if (chapterCount) detailParts.push('<p><strong>Số chương:</strong> ' + chapterCount + '</p>');
+    if (genreTexts.length > 0) detailParts.push('<p><strong>Thể loại:</strong> ' + genreTexts.join(', ') + '</p>');
 
     var suggests = [];
     if (authorUrl) {
@@ -94,6 +105,10 @@ function execute(url) {
     if (!description) description = doc.select('[itemprop="description"] p').html();
     if (!description) description = doc.select('[itemprop="description"]').html();
     
+    if (description) {
+        description = description.replace(/\r?\n/g, '<br>').replace(/(?:<br>\s*){3,}/g, '<br><br>');
+    }
+
     return Response.success({
         name: name,
         cover: cover,

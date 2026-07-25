@@ -9,7 +9,7 @@ function execute(url) {
     var doc = response.html();
     var content = "";
     
-    var selectors = ['#chapter-content', '.chapter-content', '#chapter-c', '.chapter-c', '.chapter-con', '#content'];
+    var selectors = ['#chapter-content', '.chapter-content', '#chapter-c', '.chapter-c', '.chapter-con', '#content', '.content-chap', '.reading-content', '#reading-content', '.chapter-detail', '#chapter-detail-content', '.box-content'];
     for (var i = 0; i < selectors.length; i++) {
         var el = doc.select(selectors[i]).first();
         if (el) {

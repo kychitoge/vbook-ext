@@ -17,6 +17,12 @@ function execute(url) {
     if (elements.size() === 0) elements = doc.select('#list-chapter .list-chapter li a');
     if (elements.size() === 0) elements = doc.select('#list-chapter li a');
     if (elements.size() === 0) elements = doc.select('#list-chapter a');
+    if (elements.size() === 0) elements = doc.select('.list-chapter a');
+    if (elements.size() === 0) elements = doc.select('.chapter-list a');
+    if (elements.size() === 0) elements = doc.select('.list-chap a');
+    if (elements.size() === 0) elements = doc.select('.ul-list-chap a');
+    if (elements.size() === 0) elements = doc.select('.chapter-item a');
+    if (elements.size() === 0) elements = doc.select('a[href*="/chuong-"]');
     
     for (var i = 0; i < elements.size(); i++) {
         var e = elements.get(i);

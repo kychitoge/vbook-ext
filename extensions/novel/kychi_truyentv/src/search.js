@@ -40,31 +40,73 @@ function execute(query, page) {
     if (response.ok) {
         var doc = response.html();
         var data = [];
-        
-        var items = doc.select('.info-mobile-card');
-        
-        for (var i = 0; i < items.size(); i++) {
-            var e = items.get(i);
-            var nameEl = e.select('.name a').first();
-            if (nameEl) {
-                var name = cleanText(nameEl.text());
-                var link = nameEl.attr('href');
-                var coverEl = e.select('img').first();
-                var cover = coverEl ? (coverEl.attr('src') || coverEl.attr('data-src') || coverEl.attr('data-image') || '') : '';
-                var authorEl = e.select('.author').first();
-                var author = authorEl ? cleanText(authorEl.text()) : '';
-                
-                data.push({
-                    name: name,
-                    title: name,
-                    link: normalizeUrl(link),
-                    cover: cover,
-                    description: author,
-                    host: BASE_URL
-                });
-            }
+        var seen = {};
+
+        // 1. .comic-card elements
+        var comicCards = doc.select('.comic-card');
+        for (var i = 0; i < comicCards.size(); i++) {
+            var e = comicCards.get(i);
+            var a = e.select('.comic-title a, a[itemprop="url"]').first();
+            if (!a) a = e.select('a').first();
+            if (!a) continue;
+
+            var nameEl = e.select('.comic-title h3, h3[itemprop="name"], h3').first();
+            var name = nameEl ? cleanText(nameEl.text()) : cleanText(a.attr('title') || a.text());
+            var link = a.attr('href');
+            if (!name || !link) continue;
+            var fullLink = normalizeUrl(link);
+            if (seen[fullLink]) continue;
+            seen[fullLink] = true;
+
+            var img = e.select('img.item-img, img[itemprop="image"], img').first();
+            var cover = img ? (img.attr('src') || img.attr('data-src') || img.attr('data-image') || '') : '';
+            var authorEl = e.select('.author, .view-overlay').first();
+            var author = authorEl ? cleanText(authorEl.text()) : '';
+
+            data.push({ name: name, title: name, link: fullLink, cover: cover, description: author, host: BASE_URL });
         }
-        
+
+        // 2. .list-truyen .row / .col-truyen-main .row
+        var listRows = doc.select('.list-truyen .row, .list-new .row, .col-truyen-main .row');
+        for (var j = 0; j < listRows.size(); j++) {
+            var e2 = listRows.get(j);
+            var a2 = e2.select('.home-new-comic-title a, .col-title a, a[itemprop="url"]').first();
+            if (!a2) continue;
+
+            var name2 = cleanText(a2.attr('title') || a2.text());
+            var link2 = a2.attr('href');
+            if (!name2 || !link2) continue;
+            var fullLink2 = normalizeUrl(link2);
+            if (seen[fullLink2]) continue;
+            seen[fullLink2] = true;
+
+            var chapEl = e2.select('.col-chap a, .chapter-text').first();
+            var chapText = chapEl ? cleanText(chapEl.text()) : '';
+
+            data.push({ name: name2, title: name2, link: fullLink2, cover: '', description: chapText, host: BASE_URL });
+        }
+
+        // 3. Fallback for .info-mobile-card
+        var infoCards = doc.select('.info-mobile-card');
+        for (var k = 0; k < infoCards.size(); k++) {
+            var e3 = infoCards.get(k);
+            var nameEl = e3.select('.name a').first();
+            if (!nameEl) continue;
+            var name3 = cleanText(nameEl.text());
+            var link3 = nameEl.attr('href');
+            if (!name3 || !link3) continue;
+            var fullLink3 = normalizeUrl(link3);
+            if (seen[fullLink3]) continue;
+            seen[fullLink3] = true;
+
+            var coverEl = e3.select('img').first();
+            var cover3 = coverEl ? (coverEl.attr('src') || coverEl.attr('data-src') || coverEl.attr('data-image') || '') : '';
+            var authorEl3 = e3.select('.author').first();
+            var author3 = authorEl3 ? cleanText(authorEl3.text()) : '';
+
+            data.push({ name: name3, title: name3, link: fullLink3, cover: cover3, description: author3, host: BASE_URL });
+        }
+
         var next = "";
         if (data.length > 0) {
             var nextEl = doc.select('.pagination .nav-next a, .custom-pagination-list .nav-next a').first();
@@ -74,7 +116,7 @@ function execute(query, page) {
                 next = match ? match[1] : String(parseInt(page, 10) + 1);
             }
         }
-        
+
         return Response.success(data, next);
     }
     return Response.success([]);

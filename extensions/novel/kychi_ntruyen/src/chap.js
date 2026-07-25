@@ -1,7 +1,12 @@
 load('config.js');
 
 function execute(url) {
-    var response = fetchPage(url);
+    if (url.indexOf('http') !== 0) {
+        url = BASE_URL + (url.indexOf('/') === 0 ? '' : '/') + url;
+    } else {
+        url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
+    }
+    var response = fetchWithFallback(url);
     if (!response.ok) {
         return Response.error('HTTP Error: ' + response.status);
     }

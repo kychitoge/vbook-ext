@@ -78,7 +78,7 @@ function fallbackFromNextData(url, page, doc) {
 
     var q = page || '1';
     var dataUrl = BASE_URL + '/_next/data/' + buildId + cleanPath + '.json?page=' + q;
-    var dataResp = fetchPage(dataUrl);
+    var dataResp = fetchWithFallback(dataUrl);
     if (!dataResp.ok) return [];
 
     var json = JSON.parse(dataResp.text());
@@ -88,15 +88,39 @@ function fallbackFromNextData(url, page, doc) {
 }
 
 function execute(url, page) {
-    var target = String(url || '');
-    if (target.indexOf('http') !== 0) {
+    var rawUrl = url;
+    var rawPage = page;
+
+    if (rawUrl && typeof rawUrl === 'object') {
+        if (typeof rawUrl.length === 'number') {
+            rawPage = rawUrl[1];
+            rawUrl = rawUrl[0];
+        }
+    }
+
+    var target = String(rawUrl || '').trim();
+    if (!target) {
+        target = BASE_URL + '/danh-sach/truyen-moi';
+    } else if (target.indexOf('http') !== 0) {
+        if (target.charAt(0) !== '/') target = '/' + target;
         target = BASE_URL + target;
     }
-    if (page && !/([?&])page=\d+/.test(url)) {
-        var separator = url.indexOf('?') >= 0 ? '&' : '?';
-        target += separator + 'page=' + page;
+    target = target.replace(/([^:]\/)\/+/g, '$1');
+
+    var pageMatch = target.match(/[?&]page=(\d+)/);
+    var currentPage = 1;
+    if (pageMatch) {
+        currentPage = parseInt(pageMatch[1], 10);
+    } else if (rawPage) {
+        currentPage = parseInt(rawPage, 10) || 1;
     }
-    var response = fetchPage(target);
+
+    if (!pageMatch && currentPage > 1) {
+        var separator = target.indexOf('?') >= 0 ? '&' : '?';
+        target += separator + 'page=' + currentPage;
+    }
+
+    var response = fetchWithFallback(target);
     if (response.ok) {
         var doc = response.html();
         var next = null;
@@ -123,7 +147,14 @@ function execute(url, page) {
         });
 
         if (data.length === 0) {
-            data = fallbackFromNextData(url, page, doc);
+            data = fallbackFromNextData(rawUrl, rawPage, doc);
+        }
+
+        if (!next && data.length > 0) {
+            var disabledNext = doc.select("button[disabled] svg.lucide-chevron-right, button[disabled] .lucide-chevron-right, button[disabled] svg.lucide-arrow-right").first();
+            if (!disabledNext || !disabledNext.size || disabledNext.size() === 0) {
+                next = String(currentPage + 1);
+            }
         }
 
         return Response.success(data, next);
