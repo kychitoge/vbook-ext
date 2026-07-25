@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "name": "Timotxt",
+    "author": "kychi",
+    "version": 1,
+    "source": "https://www.timotxt.com",
+    "regexp": "(www\\.)?timotxt\\.com/\\d+",
+    "description": "Nguồn truyện chữ 中文 - Timotxt (timotxt.com) \n\n Không search được được khổ lắm - share từ trình duyệt về",
+    "locale": "zh_CN",
+    "type": "chinese_novel",
+    "language": "javascript"
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "search": "search.js",
+    "detail": "detail.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Địa chỉ tên miền (URL)",
+      "subtitle": "Chọn hoặc nhập tên miền",
+      "default": "",
+      "mode": "input",
+      "format": "text"
+    }
+  }
+}

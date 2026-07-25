@@ -1,0 +1,43 @@
+load('config.js');
+
+function execute() {
+    return Response.success([
+        { title: "言情", input: "/bookstack/?cid=1", script: "gen.js" },
+        { title: "歷史", input: "/bookstack/?cid=2", script: "gen.js" },
+        { title: "其他", input: "/bookstack/?cid=3", script: "gen.js" },
+        { title: "都市", input: "/bookstack/?cid=4", script: "gen.js" },
+        { title: "玄幻", input: "/bookstack/?cid=5", script: "gen.js" },
+        { title: "體育", input: "/bookstack/?cid=6", script: "gen.js" },
+        { title: "穿越", input: "/bookstack/?cid=8", script: "gen.js" },
+        { title: "科幻", input: "/bookstack/?cid=10", script: "gen.js" },
+        { title: "校園", input: "/bookstack/?cid=13", script: "gen.js" },
+        { title: "軍事", input: "/bookstack/?cid=18", script: "gen.js" },
+        { title: "懸疑", input: "/bookstack/?cid=19", script: "gen.js" },
+        { title: "輕小說", input: "/bookstack/?cid=24", script: "gen.js" },
+        { title: "遊戲", input: "/bookstack/?cid=25", script: "gen.js" },
+        { title: "女頻", input: "/bookstack/?cid=42", script: "gen.js" },
+        { title: "同人", input: "/bookstack/?cid=43", script: "gen.js" },
+        { title: "女強", input: "/tags/%E5%A5%B3%E5%BC%B7/", script: "gen.js" },
+        { title: "無敵流", input: "/tags/%E7%84%A1%E6%95%B5%E6%B5%81/", script: "gen.js" },
+        { title: "豪門", input: "/tags/%E8%B1%AA%E9%96%80/", script: "gen.js" },
+        { title: "爽文", input: "/tags/%E7%88%BD%E6%96%87/", script: "gen.js" },
+        { title: "熱血", input: "/tags/%E7%86%B1%E8%A1%80/", script: "gen.js" },
+        { title: "空間", input: "/tags/%E7%A9%BA%E9%96%93/", script: "gen.js" },
+        { title: "娛樂圈", input: "/tags/%E5%A8%9B%E6%A8%82%E5%9C%88/", script: "gen.js" },
+        { title: "日久生情", input: "/tags/%E6%97%A5%E4%B9%85%E7%94%9F%E6%83%85/", script: "gen.js" },
+        { title: "萌寶", input: "/tags/%E8%90%8C%E5%AF%B6/", script: "gen.js" },
+        { title: "殺伐果斷", input: "/tags/%E6%AE%BA%E4%BC%90%E6%9E%9C%E6%96%B7/", script: "gen.js" },
+        { title: "腹黑", input: "/tags/%E8%85%B9%E9%BB%91/", script: "gen.js" },
+        { title: "扮豬吃虎", input: "/tags/%E6%89%AE%E8%B1%AC%E5%90%83%E8%99%8E/", script: "gen.js" },
+        { title: "HE", input: "/tags/HE/", script: "gen.js" },
+        { title: "快節奏", input: "/tags/%E5%BF%AB%E7%AF%80%E5%A5%8F/", script: "gen.js" },
+        { title: "寵文", input: "/tags/%E5%AF%B5%E6%96%87/", script: "gen.js" },
+        { title: "日常文", input: "/tags/%E6%97%A5%E5%B8%B8%E6%96%87/", script: "gen.js" },
+        { title: "腦洞大", input: "/tags/%E8%85%A6%E6%B4%9E%E5%A4%A7/", script: "gen.js" },
+        { title: "智商在線", input: "/tags/%E6%99%BA%E5%95%86%E5%9C%A8%E7%B7%9A/", script: "gen.js" },
+        { title: "推理", input: "/tags/%E6%8E%A8%E7%90%86/", script: "gen.js" },
+        { title: "專情", input: "/tags/%E5%B0%88%E6%83%85/", script: "gen.js" },
+        { title: "都市生活", input: "/tags/%E9%83%BD%E5%B8%82%E7%94%9F%E6%B4%BB/", script: "gen.js" },
+        { title: "強強", input: "/tags/%E5%BC%B7%E5%BC%B7/", script: "gen.js" }
+    ]);
+}

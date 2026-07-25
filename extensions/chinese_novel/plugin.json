@@ -66,6 +66,28 @@
     }
   },
   {
+    "folder": "kychi_timotxt",
+    "name": "Timotxt",
+    "author": "kychi",
+    "description": "Nguồn truyện chữ 中文 - Timotxt (timotxt.com) \n\n Không search được được khổ lắm - share từ trình duyệt về",
+    "source": "https://www.timotxt.com",
+    "version": 1,
+    "type": "chinese_novel",
+    "locale": "zh_CN",
+    "relativePath": "extensions/chinese_novel/kychi_timotxt",
+    "metadata": {
+      "name": "Timotxt",
+      "author": "kychi",
+      "version": 1,
+      "source": "https://www.timotxt.com",
+      "regexp": "(www\\.)?timotxt\\.com/\\d+",
+      "description": "Nguồn truyện chữ 中文 - Timotxt (timotxt.com) \n\n Không search được được khổ lắm - share từ trình duyệt về",
+      "locale": "zh_CN",
+      "type": "chinese_novel",
+      "language": "javascript"
+    }
+  },
+  {
     "folder": "kychi-cachua-c2",
     "name": "[Fanqie] Cà Chua C2",
     "author": "kychi",

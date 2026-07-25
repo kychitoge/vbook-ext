@@ -181,6 +181,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Timotxt",
+      "author": "kychi",
+      "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/kychi_timotxt/plugin.zip",
+      "version": 1,
+      "source": "https://www.timotxt.com",
+      "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/kychi_timotxt/icon.png",
+      "description": "Nguồn truyện chữ 中文 - Timotxt (timotxt.com)",
+      "type": "chinese_novel",
+      "locale": "zh_CN"
+    },
+    {
       "name": "Cà Chua Sói Xám",
       "author": "kychi",
       "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/kychi_cachua/plugin.zip",
@@ -213,7 +224,6 @@
       "type": "chinese_novel",
       "locale": "zh_CN"
     },
-
     {
       "name": "[QQ] Cánh Cụt",
       "author": "kychi",
