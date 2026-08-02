@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "name": "Tiệm Truyện Chữ (Demo)",
+    "author": "kychi",
+    "version": 1,
+     "source": "https://tiemtruyenchu.cloud",
+    "regexp": "(www\\.)?tiemtruyenchu\\.(com|cloud)/.*",
+    "description": "Tiệm Truyện Chữ - demo - kychi",
+    "locale": "vi_VN",
+    "type": "novel",
+    "language": "javascript"
+  },
+  "script": {
+    "home": "home.js",
+    "genre": "genre.js",
+    "detail": "detail.js",
+    "gen": "gen.js",
+    "search": "search.js"
+  }
+}

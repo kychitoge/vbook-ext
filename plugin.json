@@ -38,6 +38,17 @@
       "locale": "vi_VN"
     },
     {
+      "name": "Tiệm Truyện Chữ",
+      "author": "kychi",
+      "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-tiemtruyenchu/plugin.zip",
+      "version": 1,
+      "source": "https://tiemtruyenchu.cloud",
+      "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-tiemtruyenchu/icon.png",
+      "description": " DEMO - Đọc truyện chữ trên app Tiệm Truyện Chữ",
+      "type": "novel",
+      "locale": "vi_VN"
+    },
+    {
       "name": "Zumi Novel",
       "author": "kychi",
       "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/zuminovel/plugin.zip",

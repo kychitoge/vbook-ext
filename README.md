@@ -14,6 +14,9 @@ Nếu bạn thích các extension của mình, bạn có thể ủng hộ mình 
 
 ### 1. Link Nguồn Mở Rộng
 
+Tải app tại: [VBook App](https://vbookapp.com/)
+
+
 ```bash
 https://raw.githubusercontent.com/kychitoge/vbook-ext/main/plugin.json
 ```
@@ -24,8 +27,10 @@ https://raw.githubusercontent.com/kychitoge/vbook-ext/main/plugin.json
 
 | Icon | Tên | Nguồn | Phiên bản | Loại | Ngôn ngữ |
 | :---: | :--- | :--- | :---: | :---: | :---: |
+| <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/sangtacviet-app/icon.png" width="40"> | **[APP] Sáng Tác Việt** | [sangtacviet.pro](https://sangtacviet.pro) | 2 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyencv/icon.png" width="40"> | **[APP] Truyện CV** | [truyencv.io](https://truyencv.io) | 2 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_vivutruyen/icon.png" width="40"> | **Vivu Truyện** | [vivutruyen.net](https://vivutruyen.net/) | 1 | novel | vi_VN |
+| <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-tiemtruyenchu/icon.png" width="40"> | **Tiệm Truyện Chữ** | [tiemtruyenchu.com](https://tiemtruyenchu.com) | 1 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/zuminovel/icon.png" width="40"> | **Zumi Novel** | [zuminovel.com](https://zuminovel.com/) | 1 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyentv/icon.png" width="40"> | **TruyenTv** | [tvtruyen.us](https://www.tvtruyen.us/) | 5 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyenmo/icon.png" width="40"> | **Truyện Mơ** | [truyenmo.com](https://www.truyenmo.com/) | 4 | novel | vi_VN |
@@ -64,14 +69,14 @@ https://raw.githubusercontent.com/kychitoge/vbook-ext/main/plugin.json
 ### 3. Hướng dẫn cài đặt
 
 Nếu bạn là người dùng mới, hãy tham khảo hướng dẫn chi tiết tại đây:
-[Hướng dẫn cài đặt nguồn bản thường](https://vbookapp.gitbook.io/huong-dan-su-dung/nguon-mo-rong/cai-nguon-ban-thuong)
+[Hướng dẫn cài đặt nguồn](https://vbookapp.gitbook.io/huong-dan-su-dung/nguon-mo-rong/cai-nguon-ban-beta)
 
 ---
 
 ### 4. Nguồn Cộng đồng
 
 Khám phá thêm các extension khác được chia sẻ bởi cộng đồng vBook:
-[vBookExt.me - Tổng hợp nguồn vBook](https://www.vbookext.me/)
+[vBook Customizer - Tổng hợp nguồn vBook](https://www.vbookext.me/)
 
 ---
 
