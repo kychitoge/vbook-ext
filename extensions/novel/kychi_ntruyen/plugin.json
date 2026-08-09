@@ -2,10 +2,10 @@
   "metadata": {
     "name": "nTruyen",
     "author": "kychi",
-    "version": 11,
-    "source": "https://sstruyen.lat/",
+    "version": 12,
+    "source": "https://sstruyen.buzz/",
     "regexp": "https?:\\/\\/(www\\.)?sstruyen\\.[a-z0-9.-]+\\/truyen\\/[^\\/]+\\/?",
-    "description": "Đọc truyện từ sstruyen (ntruyen cũ) \n\n kéo xuống để đổi domain",
+    "description": "Đọc truyện từ sstruyen (ntruyen cũ) \n\n kéo xuống để đổi domain \n\nv12: đổi domain, update toc, chap",
     "locale": "vi_VN",
     "language": "javascript",
     "type": "novel"

@@ -1,4 +1,4 @@
-var BASE_URL = 'https://sstruyen.lat';
+var BASE_URL = 'https://sstruyen.buzz';
 var BASE_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
 try {
@@ -99,8 +99,8 @@ function fetchWithFallback(url, options) {
             if (retryResp.ok) return retryResp;
 
             var fallbackUrl = url.replace(/^https?:\/\/[^\/]+/, function(domain) {
-                if (domain.indexOf('api.') >= 0) return 'https://api.sstruyen.lat';
-                return 'https://sstruyen.lat';
+                if (domain.indexOf('api.') >= 0) return 'https://api.sstruyen.buzz';
+                return 'https://sstruyen.buzz';
             });
             if (fallbackUrl !== url) {
                 var fallbackResp = fetchPage(fallbackUrl, retryOptions);
