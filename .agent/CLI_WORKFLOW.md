@@ -46,6 +46,10 @@ npm run vbook:connect
 npm run vbook:test -- <ext-folder> <script.js> [args...]
 # hoặc: node .claude/skills/vbook-extensions/scripts/vbook.js test <ext-folder> <script.js> [args...]
 
+# Kiểm thử toàn bộ repo / Audit danh mục extension
+npm run vbook:testall -- [ext...] [--query <kw>] [--json <file>]
+# hoặc: node .claude/skills/vbook-extensions/scripts/vbook.js testall [ext...]
+
 # Cài đặt trực tiếp extension vào app VBook
 npm run vbook:install -- <ext-folder>
 

@@ -77,6 +77,7 @@ This section merges VBook's codebase architecture and developer workflow instruc
 ### 💻 Official Admin CLI Commands (Official REST-API CLI)
 * **Kết nối server app**: `node .claude/skills/vbook-extensions/scripts/vbook.js connect` (hoặc `npm run vbook:connect`)
 * **Chạy test script**: `node .claude/skills/vbook-extensions/scripts/vbook.js test <ext-folder> <script.js> [args...]`
+* **Kiểm thử toàn bộ / Audit repo**: `node .claude/skills/vbook-extensions/scripts/vbook.js testall [ext...] [--query <kw>] [--json report.json]` (hoặc `npm run vbook:testall`)
 * **Cài đặt trực tiếp vào app**: `node .claude/skills/vbook-extensions/scripts/vbook.js install <ext-folder>`
 * **Đóng gói ZIP**: `node .claude/skills/vbook-extensions/scripts/vbook.js build <ext-folder> [out.zip]`
 

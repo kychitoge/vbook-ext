@@ -1,6 +1,6 @@
 ---
 name: vbook-extensions
-description: Create, fix, test, or refactor vBook extensions against the current engine API (extension-api.md + the real ScriptExecutor runtime) — novel/comic/video/tts/translate types, explore sections, richer detail/config schema. Tests, builds, and installs via the `scripts/vbook.js` CLI against the vBook local REST API. Trigger when the user wants a new extension built, an existing one fixed/updated, audited/tested for which script is failing, or refactored to the current template style, and mentions the vBook server / extension-api.md / newer script fields (explore, tags, format, track).
+description: Create, fix, test, or refactor vBook extensions against the current engine API (extension-api.md + the real ScriptExecutor runtime) — novel/comic/audio/video/tts/translate types, explore sections, richer detail/config schema. Tests, builds, and installs via the `scripts/vbook.js` CLI against the vBook local REST API. Trigger when the user wants a new extension built, an existing one fixed/updated, audited/tested for which script is failing, or refactored to the current template style, and mentions the vBook server / extension-api.md / newer script fields (explore, tags, format, track).
 ---
 
 # vBook extensions (current engine, REST-API-driven)
@@ -54,6 +54,23 @@ Engine: Rhino `1.8.1`, `languageVersion = Context.VERSION_ES6`, `initSafeStandar
 - `.attr()` on an `Elements` collection reads the first element; `.text()` on the same collection concatenates every matched element's text. Add `.first()` explicitly for one element.
 - `.attr("href")` returns the raw value, not absolute — prepend `DOMAIN` yourself, or use `.absUrl("href")`.
 
+## Hard rule: jsoup first, regex only when the DOM can't reach it
+
+**Always try a jsoup selector before reaching for a regex over the raw response text.** Selectors survive whitespace, attribute reordering, and markup churn; regexes over HTML break on all three. Write `doc.select(...)` and only fall back to `response.text()` + regex when the data genuinely isn't in the parsed DOM.
+
+Legitimate regex cases — the value is not a DOM node at all:
+
+- **Data embedded in a script/JSON blob**: Next.js RSC payloads (`self.__next_f.push`), `__NEXT_DATA__`, `window.__INITIAL_STATE__`, inline config objects. Client-rendered lists often exist *only* here (a `BAILOUT_TO_CLIENT_SIDE_RENDERING` marker is the giveaway) — the visible anchors on such a page usually belong to the sidebar, not the list you want.
+- **Values inside an attribute or text node** (an id in a `style="url(...)"`, a stream link inside an inline `<script>`), after selecting that node with jsoup.
+- **A stream URL scraped from a player page** that never becomes markup.
+
+Rules when you do use regex:
+
+- Select the smallest node you can with jsoup first, then regex *its* `html()`/`text()` — don't regex the whole document.
+- Escaped payloads need unescaping once (`text.replace(/\\"/g, '"')`) before matching; do it in one shared helper in `config.js`, not per script.
+- **Mixing is normal and correct**: e.g. take a list's items from the JSON payload but its labels from the rendered nav, when only the nav carries them.
+- Note *why* the regex is there in a one-line comment, so the next edit doesn't "fix" it back into a selector that can't work.
+
 ## Hard rule: always check `response.ok`
 
 `fetch()`/`Http.get()` never throws on HTTP error status. Never call `.html()`/`.json()`/`.text()`/`.base64()` before checking `.ok`:
@@ -73,10 +90,11 @@ let doc = response.html();
 - `templates/novel/` — config, home, explore, genre, search, detail, toc, chap, similar, comments
 - `templates/comic/` — config, home, explore, genre, search, detail, toc, page, chap, similar, comments — `page`/`chap` are alternative implementations of the **required** per-chapter image list. Exactly one must remain (and be declared in `plugin.json.script`) — never ship both, never delete both.
 - `templates/video/` — config, home, explore, genre, search, detail, toc, chap, track, similar, comments — video playback is a `chap`→`track` chain: `chap.js` lists an episode's servers `[{title, data}]`, `track.js` resolves a chosen `data` to the stream (see `reference/extension-api.md`)
+- `templates/audio/` — config, home, explore, genre, search, detail, toc, chap, track, similar, comments — music/album sources. Same script names as video but **`chap` is required** (audio calls it unconditionally; omit it and playback silently fails), there is **no source picker** (first `chap` entry wins), `chap` must return an array/object rather than a bare URL string, and `track` must resolve to a real media URL (`native`) — `auto`/`webview` don't work for audio. `detail.js`'s `format` is `"album"` (playlist) or `"audio"` (single track). Lyrics go in `track.js`'s **`lyrics`** field (LRC / VTT / plain text, or raw text inline) — **not** `subtitles`, which audio never reads. See the audio-chain notes in `reference/extension-api.md`.
 - `templates/tts/` — voice, tts
 - `templates/translate/` — language, translate
 
-`novel`/`comic`/`video` only: `config.js` hardcodes the current site URL as `let BASE_URL = "https://...";`, then overrides it with the `DOMAIN` config key inside a `try/catch` (`if (DOMAIN) BASE_URL = DOMAIN;`). This order is deliberate — the hardcoded default keeps `BASE_URL` valid even if the app doesn't inject `DOMAIN` (the `ReferenceError` on the bare `DOMAIN` read is caught, `BASE_URL` stays the hardcode); if `DOMAIN` is injected, it wins. Never write `let BASE_URL = DOMAIN;` at top level — that throws an uncaught `ReferenceError` and kills the script when `DOMAIN` is absent. Scripts that need the site's base URL do `load('config.js');` and use `BASE_URL`, never `DOMAIN` directly. Safe under constraint 2 because the name (`BASE_URL`) differs from the config key (`DOMAIN`) it aliases — no redeclaration collision. `tts`/`translate` templates use a hardcoded engine URL directly, no alias, no shim.
+`novel`/`comic`/`audio`/`video` only: `config.js` hardcodes the current site URL as `let BASE_URL = "https://...";`, then overrides it with the `DOMAIN` config key inside a `try/catch` (`if (DOMAIN) BASE_URL = DOMAIN;`). This order is deliberate — the hardcoded default keeps `BASE_URL` valid even if the app doesn't inject `DOMAIN` (the `ReferenceError` on the bare `DOMAIN` read is caught, `BASE_URL` stays the hardcode); if `DOMAIN` is injected, it wins. Never write `let BASE_URL = DOMAIN;` at top level — that throws an uncaught `ReferenceError` and kills the script when `DOMAIN` is absent. Scripts that need the site's base URL do `load('config.js');` and use `BASE_URL`, never `DOMAIN` directly. Safe under constraint 2 because the name (`BASE_URL`) differs from the config key (`DOMAIN`) it aliases — no redeclaration collision. `tts`/`translate` templates use a hardcoded engine URL directly, no alias, no shim.
 
 `similar.js`/`comments.js` aren't in `plugin.json.script` — referenced dynamically from `detail.js`'s `genres`/`suggests`/`reviews`/`comments` fields by filename. `search.js` doubles as the target for `home.js`/`genre.js` tabs (branches on whether `query` looks like a path/URL vs. a keyword) — a real site's tabs may need dedicated listing scripts if their endpoints don't fit that branch.
 
@@ -86,10 +104,11 @@ Read only the file for the mode you're in.
 
 - **CREATE** — new extension from a story/video/comic-site URL. Read `modes/create.md`.
 - **FIX** — update an existing extension (domain change, broken selector, old→new contract migration). Read `modes/fix.md`.
-- **TEST** — check an existing extension, read-only, no edits. Test all (every script, full report) or test one (single named script). Read `modes/test.md`.
+- **TEST** — check one existing extension, read-only, no edits. Test all its scripts (full chain report) or test one (single named script). Read `modes/test.md`.
+- **AUDIT** — repo-wide: test **every** extension (or a named subset) with one probe each, classify status (work/moved/dead/auth), report. Breadth not depth. Read `modes/audit.md`.
 - **REFACTOR** — align an existing, working extension to the current template style (config.js/BASE_URL/normalizeUrl, encrypt, field contract, comment stripping) **without changing behavior**. Read `modes/refactor.md`.
 
-If unclear, ask. Bare URL with no verb → assume CREATE.
+If unclear, ask. Bare URL with no verb → assume CREATE. "Test all extensions" / "which are dead" / "audit repo" → AUDIT (many exts); "test this extension" / "what's broken in X" → TEST (one ext).
 
 ## Test / build / install — always via `scripts/vbook.js` (REST API, no MCP)
 
@@ -100,9 +119,12 @@ node .claude/skills/vbook-extensions/scripts/vbook.js connect
 node .claude/skills/vbook-extensions/scripts/vbook.js install <ext-dir> [--no-icon]
 node .claude/skills/vbook-extensions/scripts/vbook.js test    <ext-dir> <script.js> [arg1 arg2 ...]
 node .claude/skills/vbook-extensions/scripts/vbook.js build   <ext-dir> [out.zip]
+node .claude/skills/vbook-extensions/scripts/vbook.js testall [ext...] [--query <kw>] [--timeout <ms>] [--json <file>]
 ```
 
-`<ext-dir>` is repo-relative (e.g. `hhtqvietsub`). Args after the script name map to `vararg` (detail/toc/chap → `[url]`, search → `[query, page]`, track → `[episodeUrl]`, tts → `[text, voiceId]`, translate → `[text, from, to, source]`). Icon auto-included from `<ext-dir>/icon.png`; pass `--no-icon` for faster installs.
+`testall` is the repo-wide audit (AUDIT mode, `modes/audit.md`): with no ext args it probes every on-disk ext (each dir with `plugin.json`+`src/`), else just the named ones. Per ext it runs `search.js` with `--query` (default `tien`; falls back to `home.js`/first script if no `search`), unwraps the nested `Response` payload, and prints one status line + a grouped summary: **WORK** / **MOVED** (host≠source) / **AUTH/MSG** (`code:1`) / **EMPTY** (`code:0`, 0 items) / **CRASH** (JS error) / **UNREACHABLE** (timeout, auto-retried once). `--json` also writes machine-readable rows. Statuses are one-keyword triage, not proof — never delete on EMPTY/CRASH/UNREACHABLE without a direct dead-site confirmation (see AUDIT mode).
+
+`<ext-dir>` is repo-relative (e.g. `hhtqvietsub`). Args after the script name map to `vararg` (detail/toc/chap → `[url]`, search → `[query, page]`, track → `[episodeUrl]`, tts → `[text, voiceId]`, translate → `[text, from, to, source]`). Icon auto-included from `<ext-dir>/icon.png` — **every extension must ship one** (200x200). `--no-icon` skips it for fast iteration probes only; never use it for the final install, and never leave `icon.png` missing.
 
 **Server URL:** the CLI picks a server in this order:
 1. `--server <url>` (explicit, single, no probing)
