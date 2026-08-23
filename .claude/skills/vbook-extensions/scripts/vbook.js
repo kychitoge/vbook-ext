@@ -49,6 +49,7 @@ function request(method, urlStr, bodyObj) {
       path: u.pathname + u.search,
       method: method,
       headers: headers,
+      insecureHTTPParser: true,
     }, function (res) {
       let data = "";
       res.setEncoding("utf8");
