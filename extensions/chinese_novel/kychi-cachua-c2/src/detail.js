@@ -1,6 +1,7 @@
 load("config.js");
 
 function execute(url) {
+    url = normalizeUrl(url);
     var bookId = getBookId(url);
     if (!bookId) return Response.error("Không tìm thấy ID truyện");
 
@@ -17,13 +18,10 @@ function execute(url) {
 
     var b = json.data;
 
-    // creation_status: 1 = 连载中 (ongoing), 0 = 已完结 (completed)
     var statusVal = b.creation_status !== undefined ? b.creation_status : b.status;
     var ongoing = (statusVal === 1 || statusVal === "1");
-    // Nếu không xác định được thì mặc định ongoing
     if (statusVal === undefined || statusVal === null || statusVal === "") ongoing = true;
 
-    // Chỉ hiện: điểm, số từ, lượt xem, chương mới nhất — toàn tiếng Trung
     var infoLines = [];
     if (b.score)             infoLines.push("评分: " + b.score);
     if (b.word_number)       infoLines.push("\u5B57\u6570: " + formatNum(b.word_number) + "\u5B57");
@@ -32,7 +30,6 @@ function execute(url) {
 
     var detailStr = infoLines.join("\n");
 
-    // Genre tags — lấy từ pure_category_tags (CSV)
     var genres = [];
     if (b.category) {
         genres.push({ title: decodeText(b.category), input: decodeText(b.category), script: "search.js" });
@@ -56,6 +53,10 @@ function execute(url) {
         description: decodeText(cleanText(b.abstract || "")),
         ongoing:     ongoing,
         detail:      detailStr,
+        url:         bookLink(bookId),
+        type:        "chinese_novel",
+        format:      "novel",
+        tags:        genres,
         genres:      genres.length > 0 ? genres : undefined
     });
 }

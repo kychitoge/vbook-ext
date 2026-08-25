@@ -29,14 +29,10 @@ function cleanText(text) {
     return String(text).replace(/[\r\n]+/g, "\n").replace(/[ \t]+/g, " ").trim();
 }
 
-var Response = {
-    success: function(data, data2) {
-        return JSON.stringify({ code: 0, data: data, data2: data2 });
-    },
-    error: function(data) {
-        return JSON.stringify({ code: 1, data: String(data || '') });
-    }
-};
+function normalizeUrl(url) {
+    if (!url) return "";
+    return String(url).trim();
+}
 
 function SafeJson(response) {
     if (!response) return null;

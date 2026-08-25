@@ -1,7 +1,7 @@
 load("config.js");
 
 function execute(key, page) {
-    if (page && parseInt(page, 10) > 1) return Response.success([]);
+    if (page && parseInt(page, 10) > 1) return Response.success([], "");
 
     var response = fetchPage(BASE_URL + "/search?key=" + encodeURIComponent(key), { timeout: 15000 });
 
@@ -43,5 +43,5 @@ function execute(key, page) {
         }
     }
 
-    return Response.success(list);
+    return Response.success(list, "");
 }

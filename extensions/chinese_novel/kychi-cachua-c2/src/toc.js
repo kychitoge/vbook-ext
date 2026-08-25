@@ -1,6 +1,7 @@
 load("config.js");
 
 function execute(url) {
+    url = normalizeUrl(url);
     var bookId = getBookId(url);
     if (!bookId) return Response.error("Không tìm thấy ID truyện");
 

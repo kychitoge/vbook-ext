@@ -1,7 +1,7 @@
 load("config.js");
 
 function execute(url, page) {
-    if (page && parseInt(page, 10) > 1) return Response.success([]);
+    if (page && parseInt(page, 10) > 1) return Response.success([], "");
 
     var response = fetch(url, {
         headers: { "User-Agent": BASE_UA, "Accept": "application/json" },
@@ -17,13 +17,13 @@ function execute(url, page) {
     if (json.code !== 0) return Response.error("Chưa đăng nhập tài khoản Fanqie");
 
     var items = json.data || [];
-    if (!Array.isArray(items) || items.length === 0) return Response.success([]);
+    if (!Array.isArray(items) || items.length === 0) return Response.success([], "");
 
     var bookIds = [];
     for (var i = 0; i < items.length; i++) {
         if (items[i] && items[i].book_id) bookIds.push(String(items[i].book_id));
     }
-    if (bookIds.length === 0) return Response.success([]);
+    if (bookIds.length === 0) return Response.success([], "");
 
     var results = [];
     var batchSize = 50;
@@ -54,5 +54,5 @@ function execute(url, page) {
             }
         }
     }
-    return Response.success(results);
+    return Response.success(results, "");
 }

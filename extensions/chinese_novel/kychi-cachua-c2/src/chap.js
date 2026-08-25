@@ -1,8 +1,7 @@
 load("config.js");
 
 function execute(url) {
-    // App ghép host + url nên url có dạng "https://gofq.52dns.cc/7228941859807527476"
-    // Dùng regex \d{10,} để bỏ qua số ngắn trong domain (52dns.cc)
+    url = normalizeUrl(url);
     var m = String(url).match(/(\d{10,})/);
     var itemId = m ? m[1] : "";
     if (!itemId) {

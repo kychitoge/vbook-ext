@@ -40,6 +40,6 @@ function execute(url, page) {
         }
     }
 
-    var next = list.length >= 10 ? String(parseInt(page, 10) + 1) : null;
+    var next = list.length >= 10 ? String(parseInt(page, 10) + 1) : "";
     return Response.success(list, next);
 }
