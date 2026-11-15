@@ -2,7 +2,7 @@ load('config.js');
 
 function execute(url) {
     url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
-    var response = fetchWithFallback(url);
+    var response = fetchPage(url);
     if (!response.ok) return Response.error('HTTP Error: ' + response.status);
 
     var doc = response.html();

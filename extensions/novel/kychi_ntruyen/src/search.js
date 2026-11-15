@@ -3,7 +3,7 @@ function execute(key, page) {
     var q = encodeURIComponent(key);
     var target = BASE_URL + '/tim-kiem?keyword=' + q;
     if (page && page !== '1') target += '&page=' + page;
-    var response = fetchWithFallback(target);
+    var response = fetchPage(target);
     if (response.ok) {
         var doc = response.html();
         var next = null;

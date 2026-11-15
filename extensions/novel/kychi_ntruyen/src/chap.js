@@ -2,7 +2,7 @@ load('config.js');
 
 function execute(url) {
     url = normalizeUrl(url);
-    var response = fetchWithFallback(url);
+    var response = fetchPage(url);
     if (!response.ok) {
         return Response.error('HTTP Error: ' + response.status);
     }

@@ -1,4 +1,4 @@
-var BASE_URL = 'https://sstruyen.buzz';
+var BASE_URL = 'https://sstruyen.pics';
 var BASE_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
 try {
@@ -82,33 +82,6 @@ function fetchPage(url, options) {
 
     options.headers = headers;
     return fetch(url, options);
-}
-
-function fetchWithFallback(url, options) {
-    var response = fetchPage(url, options);
-    if (!response.ok) {
-        var status = response.status;
-        if (status === 504 || status === 502 || status === 503 || status === 522 || status === 524 || status === 0 || status === 404) {
-            var retryOptions = options || {};
-            retryOptions.headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7'
-            };
-            var retryResp = fetchPage(url, retryOptions);
-            if (retryResp.ok) return retryResp;
-
-            var fallbackUrl = url.replace(/^https?:\/\/[^\/]+/, function(domain) {
-                if (domain.indexOf('api.') >= 0) return 'https://api.sstruyen.buzz';
-                return 'https://sstruyen.buzz';
-            });
-            if (fallbackUrl !== url) {
-                var fallbackResp = fetchPage(fallbackUrl, retryOptions);
-                if (fallbackResp.ok) return fallbackResp;
-            }
-        }
-    }
-    return response;
 }
 
 if (typeof Response === 'undefined') {

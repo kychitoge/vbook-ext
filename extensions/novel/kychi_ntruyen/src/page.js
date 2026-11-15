@@ -1,13 +1,13 @@
 load('config.js');
 function execute(url) {
     url = url.replace(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img, BASE_URL);
-    var response = fetchWithFallback(url);
+    var response = fetchPage(url);
     if (!response.ok) return null;
     var html = response.text();
     var storyId = extractStoryId(html);
     if (!storyId) return null;
     var apiBase = getApiDomain() + '/novels/' + storyId + '/chapters?page=';
-    var apiResponse = fetchWithFallback(apiBase + '1');
+    var apiResponse = fetchPage(apiBase + '1');
     if (!apiResponse.ok) return null;
     var json = JSON.parse(apiResponse.text());
     var totalPages = json.totalPages || 1;

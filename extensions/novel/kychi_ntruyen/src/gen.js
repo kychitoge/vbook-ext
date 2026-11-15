@@ -78,7 +78,7 @@ function fallbackFromNextData(url, page, doc) {
 
     var q = page || '1';
     var dataUrl = BASE_URL + '/_next/data/' + buildId + cleanPath + '.json?page=' + q;
-    var dataResp = fetchWithFallback(dataUrl);
+    var dataResp = fetchPage(dataUrl);
     if (!dataResp.ok) return [];
 
     var json = JSON.parse(dataResp.text());
@@ -120,7 +120,7 @@ function execute(url, page) {
         target += separator + 'page=' + currentPage;
     }
 
-    var response = fetchWithFallback(target);
+    var response = fetchPage(target);
     if (response.ok) {
         var doc = response.html();
         var next = null;

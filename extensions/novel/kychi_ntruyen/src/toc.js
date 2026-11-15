@@ -3,7 +3,7 @@ load('config.js');
 function execute(url) {
     var listchapter = [];
     var normalizedUrl = normalizeUrl(url);
-    var response = fetchWithFallback(normalizedUrl);
+    var response = fetchPage(normalizedUrl);
 
     if (response.ok) {
         var html = response.text();
@@ -13,7 +13,7 @@ function execute(url) {
     if (listchapter.length === 0) {
         var apiUrl = buildApiUrl(url, BASE_URL);
         if (apiUrl) {
-            var apiResp = fetchWithFallback(apiUrl);
+            var apiResp = fetchPage(apiUrl);
             if (apiResp.ok) {
                 try {
                     var json = JSON.parse(apiResp.text());
@@ -128,7 +128,7 @@ function buildApiUrl(url, baseUrl) {
         /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img,
         BASE_URL
     );
-    var response = fetchWithFallback(normalized);
+    var response = fetchPage(normalized);
     if (!response.ok) return null;
     var html = response.text();
     var storyId = extractStoryId(html);
