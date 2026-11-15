@@ -49,27 +49,33 @@ extensions/{loại}/{author}_{name}/
 
 ## ⚡ 3. Ràng buộc Môi trường Rhino Runtime (ES6 Safe Mode)
 
-Bộ nhân thực thi JavaScript trong ứng dụng vBook là **Rhino 1.8.1 (ES6 Safe Subset)** running on Java Context `Context.VERSION_ES6`.
+Bộ nhân thực thi JavaScript trong ứng dụng vBook là **Rhino 1.8.1 (ES6 Safe Subset)** chạy trên Java Context `Context.VERSION_ES6`, **KHÔNG phải Node.js**.
 
 ### ✅ Các cú pháp ĐƯỢC PHÉP dùng:
-* Khai báo biến `let`, `const`, `var` (Lưu ý quy tắc cấm khai báo trùng key config bên dưới).
-* Hàm `function`, vòng lặp `if/else`, `for`, `while`, `try/catch`.
-* Các hàm mảng ES5/ES6 chuẩn: `forEach`, `map`, `filter`, `sort`, `reduce`.
-* Regex, `JSON.parse`, `JSON.stringify`.
-* Nạp thư viện nội bộ: `load("config.js")` (Lưu ý: `load` không đệ quy).
+* **Chỉ viết Pure JS**: Tuyệt đối **không cài thêm Node packages** và không dùng `require()`, `import`/`export` trong mã nguồn extension (`src/*.js`). Các gói trong `package.json` chỉ dùng cho CLI/test runner local.
+* **Bắt buộc khai báo biến bằng `let` hoặc `var` (KHÔNG dùng `const`)**: Trên Rhino JS engine, nhiều trường hợp dùng `const` gây lỗi runtime/syntax (khi nạp qua `load()`, trong vòng lặp, hoặc scope bị đánh giá lại). Luôn dùng `let` hoặc `var`.
+* Hàm `function (el) { ... }`, vòng lặp `if/else`, `for`, `while`, `try/catch/finally`.
+* Các hàm mảng ES5/ES6 chuẩn: `forEach`, `map`, `filter`, `sort`, `reduce`, `slice`.
+* Regex thuần (không named capture group / lookbehind), `JSON.parse`, `JSON.stringify`.
+* Nạp thư viện nội bộ: `load("config.js")` (Lưu ý: `load` không đệ quy; `load("crypto.js")` nạp Native Crypto Bridge của app).
 
 ### ❌ Các quy tắc TUYỆT ĐỐI KHÔNG DÙNG & CẤM VI PHẠM:
-1. **CẤM khai báo biến trùng tên với key trong `plugin.json.config`**:
-   Mọi key trong config (như `DOMAIN`) đều được App tự động tiêm dưới dạng `const DOMAIN = "..."` trước khi script chạy. Khai báo lại (`let DOMAIN = ...`) sẽ gây lỗi **SyntaxError** hỏng toàn bộ script.
+1. **KHÔNG dùng `const` trong `src/*.js`** — bắt buộc dùng `let` hoặc `var`.
+2. **KHÔNG cài thêm / sử dụng Node packages** — chỉ viết Pure JS dựa trên API mà Rhino host cung cấp trong [docs/extension-api.md](./extension-api.md).
+3. **CẤM khai báo biến trùng tên với key trong `plugin.json.config`**:
+   Mọi key trong config (như `DOMAIN`) đều được App tự động tiêm trước khi script chạy. Khai báo lại (`let DOMAIN = ...`) sẽ gây lỗi **SyntaxError** hỏng toàn bộ script.
    👉 *Cách dùng chuẩn*: Khai báo `let BASE_URL = "https://...";` trong `config.js` rồi gán đè trong `try { if (typeof DOMAIN !== "undefined" && DOMAIN) BASE_URL = DOMAIN; } catch(e){}`.
-2. **LUÔN KIỂM TRA `response.ok`**:
+4. **LUÔN KIỂM TRA `response.ok`**:
    Hàm `fetch()` không throw error khi gặp HTTP 40x/50x. Không bao giờ gọi `.html()`, `.json()`, `.text()` trước khi check `if (!response.ok) return Response.error("HTTP " + response.status);`.
-3. **CÁC CÚ PHÁP CẤM DÙNG TRÊN RHINO**:
+5. **Ép kiểu Java String sang JS String**:
+   Luôn nối `+ ""` sau `.text()`, `.attr()`, `.html()` (ví dụ `el.text() + ""`) trước khi trả về hoặc xử lý chuỗi.
+6. **CÁC CÚ PHÁP CẤM DÙNG TRÊN RHINO**:
+   - KHÔNG dùng `const`.
    - KHÔNG dùng `async/await`, `Promise`.
-   - KHÔNG dùng Optional Chaining `?.` hoặc Nullish Coalescing `??`.
-   - KHÔNG dùng Object/Array Spread (`{...obj}`).
-   - KHÔNG dùng `Array.prototype.flat`/`flatMap`.
-   - KHÔNG dùng import/export module.
+   - KHÔNG dùng Optional Chaining `?.` hoặc Nullish Coalescing `??` (dùng `obj && obj.prop`, `x || default`).
+   - KHÔNG dùng Object/Array Spread (`{...obj}`, `[...arr]`) hay default params (`function f(a = 1)`).
+   - KHÔNG dùng `Array.prototype.flat`/`flatMap`, `String.matchAll`.
+   - KHÔNG dùng `import`/`export` module hay `require()`.
    - KHÔNG gọi trực tiếp Java Reflection (`java.*`, `Packages.*`).
 
 ---
@@ -380,3 +386,39 @@ container.select("img[data-lazy-src]").forEach(function(img) {
     if (lazySrc) img.attr("src", lazySrc);
 });
 ```
+
+---
+
+## 📚 9. Kinh nghiệm Thực chiến (`dat-bi/ext-vbook/vbook-tool/context`) & API Mở rộng (`Darkrai9x`)
+
+Tổng hợp các lưu ý quan trọng từ thực tế vận hành trên app vBook và bản đặc tả mới nhất trong [docs/extension-api.md](./extension-api.md):
+
+1. **Quản lý vòng đời Browser (`Engine.newBrowser`)**:
+   Luôn đóng trình duyệt trong khối `try { ... } finally { b.close(); }` để tránh rò rỉ bộ nhớ/treo WebView khi script ném ngoại lệ:
+   ```javascript
+   var b = Engine.newBrowser();
+   try {
+       b.setUserAgent(UserAgent.android());
+       b.block(["*.png", "*.jpg", "*.gif", "*.woff"]);
+       b.launch(url, 12000);
+       var doc = b.html();
+       return Response.success(doc.select("body").html() + "");
+   } finally {
+       b.close();
+   }
+   ```
+   - Lưu ý khi dùng `b.loadHtml(html, baseUrl)`: thứ tự tham số có thể khác tài liệu cũ trên một số bản app, nên test probe trên thiết bị thật trước khi phụ thuộc vào `loadHtml`.
+2. **Các hàm Jsoup cần tránh trên Rhino**:
+   Tránh `tagName()`, `is()`, `tag()`, `doc.body()` nếu chưa kiểm chứng trên thiết bị; ưu tiên dùng CSS selector chuẩn (`doc.select("body")`, `doc.select("...")`).
+3. **Xử lý trang khó (Hard Sites)**:
+   - **Encoding Trung (`gbk`)**: Dùng `res.html("gbk")` hoặc `res.text("gbk")`.
+   - **Next.js (`__NEXT_DATA__`, `self.__next_f.push`)**: Ưu tiên bắt API route thực qua DevTools; nếu dữ liệu nằm trong payload script, chọn node `<script>` nhỏ nhất rồi mới regex/unescape.
+   - **SvelteKit (`devalue` payload)**: Nếu `JSON.parse` lỗi do cú pháp JS object literal, có thể dùng `eval("dataArr = " + raw + ";")` có kiểm soát.
+   - **CSRF / Cookie ẩn**: Một số site trả `_csrfToken` nhưng `res.headers["set-cookie"]` trống; kiểm tra `res.request.headers.cookie` hoặc `localCookie.getCookie()`, lưu lại vào `localStorage` trước khi fallback sang `Engine.newBrowser()`.
+   - **Cloudflare**: `curl`/Node ở máy dev có thể bị chặn `Just a moment...` trong khi `fetch()` trên app vBook vẫn qua được — luôn kiểm chứng bằng `npm run vbook:test` trên thiết bị thật.
+4. **Crypto Native Bridge (`load("crypto.js")`)**:
+   Ưu tiên dùng `load("crypto.js")` (Native Bridge Kotlin/Java nhanh hơn JS thuần rất nhiều) cho MD5, SHA1/256/512, HMAC, AES (CBC/ECB/CFB/OFB/CTR, hỗ trợ cả `encryptGcm`/`decryptGcm` mới). Các thuật toán cũ như DES, RC4, Rabbit, PBKDF2 không có trong Native Bridge.
+5. **Các API & Loại Extension mới trong [docs/extension-api.md](./extension-api.md)**:
+   - **Settings nâng cao**: Hỗ trợ `Dynamic config script`, `Connection limits`, `Actions`.
+   - **API hệ thống mới**: `Blob`, `Local database` (`localDb`), `Local book` (`localBook`).
+   - **Engine mới**: **AI Assistant Engine** (`chatStream`, Tool functions) bên cạnh `Novel`, `Comic`, `Video` (hỗ trợ cả *Short video feed*), `Audio`, `TTS`, `Translate`.

@@ -86,13 +86,20 @@ This section merges VBook's codebase architecture and developer workflow instruc
 * **Cập nhật catalog tổng**: `npm run build:catalog` (Bắt buộc chạy trước khi commit nếu có đổi extension)
 
 ### ⚠️ JS Runtime Constraints (Rhino ES6 Safe Mode)
-Script extension chạy trên Rhino (ES6 safe subset).
-* **Tránh**: `async/await`, `?.`, `??`, `{...spread}`, `Array.flat`, numeric separators.
-* **Cấm**: Khai báo biến trùng tên với key trong `plugin.json.config` (ví dụ `let DOMAIN = ...` gây SyntaxError). Dùng `load('config.js')` và `BASE_URL`.
-* **Quy tắc quan trọng**: Luôn kiểm tra `response.ok` trước khi gọi `.html()`, `.json()`, `.text()`.
+Script extension chạy trên **Rhino JS engine** (ES6 safe subset) trong app vBook, **KHÔNG phải Node.js**:
+* **Chỉ viết Pure JS**: Tuyệt đối không cài thêm Node packages hay dùng `require()`, `import`/`export` trong mã nguồn extension (`src/*.js`). Các gói trong `package.json` chỉ phục vụ CLI/tooling local.
+* **Bắt buộc dùng `let` hoặc `var` (KHÔNG dùng `const`)**: Nhiều trường hợp dùng `const` trên Rhino JS engine gây lỗi runtime/syntax; luôn khai báo biến bằng `let` hoặc `var`.
+* **Tránh**: `const`, `async/await`, `Promise`, `?.`, `??`, `{...spread}`, `Array.flat`/`flatMap`, `String.matchAll`, default params (`function f(a = 1)`), numeric separators.
+* **Cấm**: Khai báo biến trùng tên với key trong `plugin.json.config` (ví dụ `let DOMAIN = ...` gây `SyntaxError` vì app tự tiêm config). Dùng `load('config.js')` và `BASE_URL` (hoặc đọc defensive qua `typeof`).
+* **Quy tắc thực chiến (từ `dat-bi/ext-vbook` context)**:
+  - Luôn kiểm tra `response.ok` trước khi gọi `.html()`, `.json()`, `.text()`.
+  - Ép kiểu Java String sang JS String bằng `+ ""` sau `.text()`, `.attr()`, `.html()`.
+  - Luôn đóng `Engine.newBrowser()` trong khối `try { ... } finally { browser.close(); }`.
+  - Tránh các hàm Jsoup không ổn định trên Rhino như `tagName()`, `is()`, `tag()`, `doc.body()` (dùng `doc.select("body")` thay thế).
 
 ### 📚 Key Documentation Paths
-* **Official Extension API (Standard)**: [docs/extension-api.md](./docs/extension-api.md)
+* **Official Extension API (Standard — Darkrai9x)**: [docs/extension-api.md](./docs/extension-api.md)
+* **Master Development Guide (Rhino + Context Lessons)**: [docs/EXTENSION_DEVELOPMENT_GUIDE.md](./docs/EXTENSION_DEVELOPMENT_GUIDE.md)
 * **Official Verification Checklist**: [docs/verify-checklist.md](./docs/verify-checklist.md)
 * **Skill Master Spec**: [.claude/skills/vbook-extensions/SKILL.md](.claude/skills/vbook-extensions/SKILL.md)
 * **Decryption Patterns**: [docs/DECRYPTION_PATTERNS.md](./docs/DECRYPTION_PATTERNS.md)

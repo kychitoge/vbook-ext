@@ -69,7 +69,7 @@ Trước khi thực hiện commit mã nguồn hoặc tạo Pull Request, vui lò
 
 - [ ] **Lệnh CLI**: Thư mục extension và metadata được tạo/chỉnh sửa thông qua CLI.
 - [ ] **Không chỉnh sửa catalog bằng tay**: Không chỉnh sửa trực tiếp các file `plugin.json` tổng hợp ở gốc.
-- [ ] **Quy tắc Rhino ES6 Safe**: Không dùng `async/await`, `?.`, `??`, `{...spread}`, `Array.flat`. Không khai báo biến trùng key `plugin.json.config` (như `let DOMAIN = ...`).
+- [ ] **Quy tắc Rhino ES6 Safe**: Chỉ viết Pure JS (không cài thêm hay dùng Node packages trong `src/*.js`), bắt buộc dùng `let` hoặc `var` (không dùng `const`). Không dùng `async/await`, `?.`, `??`, `{...spread}`, `Array.flat`. Không khai báo biến trùng key `plugin.json.config` (như `let DOMAIN = ...`).
 - [ ] **Kiểm tra `response.ok`**: Luôn kiểm tra `if (!response.ok)` trước khi parse DOM/JSON.
 - [ ] **Đóng gói ZIP**: Extension đã được chạy lệnh build ra tệp tin `plugin.zip` thành công.
 - [ ] **Catalog Rebuilt**: Đã chạy lệnh `npm run build:catalog` và có thay đổi trong danh mục tổng.
