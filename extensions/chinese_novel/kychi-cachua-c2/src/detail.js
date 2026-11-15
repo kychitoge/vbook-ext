@@ -31,8 +31,11 @@ function execute(url) {
     var detailStr = infoLines.join("\n");
 
     var genres = [];
+    var suggests = [];
     if (b.category) {
-        genres.push({ title: decodeText(b.category), input: decodeText(b.category), script: "search.js" });
+        var mainCategory = decodeText(b.category);
+        genres.push({ title: mainCategory, input: mainCategory, script: "search.js" });
+        suggests.push({ title: "同类型:" + mainCategory, input: mainCategory, script: "search.js" });
     }
     if (b.pure_category_tags) {
         var tags = String(b.pure_category_tags).split(",");
@@ -48,15 +51,15 @@ function execute(url) {
     return Response.success({
         name:        decodeText(b.book_name || ""),
         cover:       b.thumb_url || "",
-        host:        BASE_URL,
+        host:        FANQIE_URL,
         author:      decodeText(b.author || ""),
         description: decodeText(cleanText(b.abstract || "")),
         ongoing:     ongoing,
         detail:      detailStr,
         url:         bookLink(bookId),
-        type:        "chinese_novel",
+        type:        "novel",
         format:      "novel",
-        tags:        genres,
-        genres:      genres.length > 0 ? genres : undefined
+        genres:      genres,
+        suggests:    suggests
     });
 }

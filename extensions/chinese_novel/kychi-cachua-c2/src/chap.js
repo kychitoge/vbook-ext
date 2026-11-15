@@ -5,21 +5,15 @@ function execute(url) {
     var m = String(url).match(/(\d{10,})/);
     var itemId = m ? m[1] : "";
     if (!itemId) {
-        return Response.error("ID chương không hợp lệ");
+        return Response.error("Không tìm thấy mã chương trong liên kết. Mở lại mục lục và thử lại.");
     }
 
     // Thử lấy nội dung — retry 1 lần nếu 5xx
-    var response = fetch(BASE_URL + "/content?item_id=" + itemId, {
-        headers: { "User-Agent": BASE_UA },
-        timeout: 20000
-    });
+    var response = fetchPage(BASE_URL + "/content?item_id=" + itemId, { timeout: 20000 });
 
     // Nếu 5xx thì thử lại 1 lần
     if (response && (response.status >= 500 && response.status < 600)) {
-        response = fetch(BASE_URL + "/content?item_id=" + itemId, {
-            headers: { "User-Agent": BASE_UA },
-            timeout: 20000
-        });
+        response = fetchPage(BASE_URL + "/content?item_id=" + itemId, { timeout: 20000 });
     }
 
     if (!response || !response.ok) {
@@ -41,9 +35,9 @@ function execute(url) {
     // Parse XHTML <p> tags
     var paragraphs = [];
     var pReg = /<p[^>]*>([\s\S]*?)<\/p>/g;
-    var m;
-    while ((m = pReg.exec(content)) !== null) {
-        var t = m[1]
+    var match;
+    while ((match = pReg.exec(content)) !== null) {
+        var t = match[1]
             .replace(/<[^>]+>/g, "")
             .replace(/&nbsp;/g, " ")
             .replace(/&lt;/g, "<")

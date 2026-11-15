@@ -1,31 +1,59 @@
 load("config.js");
 
 function execute() {
-    // Base URL cho thư viện Fanqie
-    var base = FANQIE_URL + "/api/author/library/book_list/v0/?page_count=20&creation_status=-1&word_count=-1&book_type=-1&sort=0";
+    var g = String(GENDER);
+    var base = FANQIE_URL + "/api/author/library/book_list/v0/?page_count=20&creation_status=-1&word_count=-1&book_type=-1&sort=0&gender=" + g;
 
-    function url(catId, gender) {
-        return base + "&gender=" + gender + "&category_id=" + catId + "&page_index={{page}}";
+    function buildUrl(catId) {
+        return base + "&category_id=" + String(catId) + "&page_index={{page}}";
     }
 
-    return Response.success([
-        { title: "\u7384\u5E7B",              input: url("7",    "1"), script: "gen.js" },
-        { title: "\u5947\u5E7B",              input: url("8",    "1"), script: "gen.js" },
-        { title: "\u6B66\u4FCA",              input: url("9",    "1"), script: "gen.js" },
-        { title: "\u4ED9\u4FA0",              input: url("10",   "1"), script: "gen.js" },
-        { title: "\u90FD\u5E02",              input: url("11",   "1"), script: "gen.js" },
-        { title: "\u5386\u53F2",              input: url("12",   "1"), script: "gen.js" },
-        { title: "\u519B\u4E8B",              input: url("13",   "1"), script: "gen.js" },
-        { title: "\u6E38\u620F",              input: url("14",   "1"), script: "gen.js" },
-        { title: "\u7ADE\u6280",              input: url("15",   "1"), script: "gen.js" },
-        { title: "\u79D1\u5E7B",              input: url("16",   "1"), script: "gen.js" },
-        { title: "\u60AC\u7591",              input: url("17",   "1"), script: "gen.js" },
-        { title: "\u8111\u6D1E(\u7537)",     input: url("1007", "1"), script: "gen.js" },
-        { title: "\u73B0\u4EE3\u8A00\u60C5", input: url("19",   "0"), script: "gen.js" },
-        { title: "\u53E4\u4EE3\u8A00\u60C5", input: url("20",   "0"), script: "gen.js" },
-        { title: "\u5E7B\u60F3\u8A00\u60C5", input: url("21",   "0"), script: "gen.js" },
-        { title: "\u9752\u6625\u6821\u56ED", input: url("23",   "0"), script: "gen.js" },
-        { title: "\u540C\u4EBA",              input: url("24",   "0"), script: "gen.js" },
-        { title: "\u8111\u6D1E(\u5973)",     input: url("1008", "0"), script: "gen.js" }
-    ]);
+    var list = [];
+    var seen = {};
+    var res = fetchPage(FANQIE_URL + "/api/author/book/category_list/v0/?book_type=0&gender=" + g, { timeout: 15000, cache: 86400 });
+
+    if (!res || !res.ok) {
+        return Response.error("Không thể tải danh sách thể loại (HTTP " + (res ? res.status : "unknown") + "). Kiểm tra kết nối và thử lại.");
+    }
+
+    var json = SafeJson(res);
+    if (!json || json.code !== 0 || !json.data || !Array.isArray(json.data)) {
+        return Response.error("Dữ liệu thể loại không đúng định dạng. Thử tải lại sau.");
+    }
+
+    function addItem(item) {
+        if (!item || !item.category_id || !item.name) return;
+        var cid = String(item.category_id);
+        if (seen[cid]) return;
+        seen[cid] = true;
+        list.push({
+            title: cleanText(item.name),
+            input: buildUrl(cid),
+            script: "gen.js"
+        });
+    }
+
+    var groups = MAIN_GENRE_ONLY
+        ? ["\u4E3B\u5206\u7C7B"]
+        : ["\u4E3B\u5206\u7C7B", "\u4E3B\u9898", "\u89D2\u8272", "\u60C5\u8282"];
+
+    for (var gi = 0; gi < groups.length; gi++) {
+        var targetLabel = groups[gi];
+        for (var i = 0; i < json.data.length; i++) {
+            var item = json.data[i];
+            if (item && item.label === targetLabel) addItem(item);
+        }
+    }
+
+    if (!MAIN_GENRE_ONLY) {
+        for (var j = 0; j < json.data.length; j++) {
+            addItem(json.data[j]);
+        }
+    }
+
+    if (list.length === 0) {
+        return Response.error("Không tìm thấy thể loại phù hợp. Kiểm tra lại cấu hình hoặc thử tải lại sau.");
+    }
+
+    return Response.success(list);
 }

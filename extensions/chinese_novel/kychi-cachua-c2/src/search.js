@@ -1,22 +1,24 @@
 load("config.js");
 
 function execute(key, page) {
-    if (page && parseInt(page, 10) > 1) return Response.success([], "");
+    if (!page) page = "1";
 
-    var response = fetchPage(BASE_URL + "/search?key=" + encodeURIComponent(key), { timeout: 15000 });
+    var response = fetchPage(BASE_URL + "/search?key=" + encodeURIComponent(key) + "&page=" + encodeURIComponent(page) + "&tab_type=1", { timeout: 15000, cache: 300 });
 
     if (!response || !response.ok) {
-        return Response.error("Lỗi tìm kiếm (HTTP " + (response ? response.status : "unknown") + ")");
+        return Response.error("Không thể tìm kiếm (HTTP " + (response ? response.status : "unknown") + "). Kiểm tra kết nối và thử lại.");
     }
 
     var json = SafeJson(response);
-    if (!json) return Response.error("Lỗi phân tích kết quả tìm kiếm");
+    if (!json) return Response.error("Dữ liệu tìm kiếm không đúng định dạng. Thử lại sau.");
 
     var list = [];
     var seen = {};
+    var hasMore = false;
     var tabs = json.search_tabs || [];
 
     for (var t = 0; t < tabs.length; t++) {
+        if (tabs[t].has_more === true) hasMore = true;
         var items = tabs[t].data || tabs[t].book_data || [];
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
@@ -37,11 +39,12 @@ function execute(key, page) {
                     description: decodeText(cleanText(b.abstract || "")),
                     detail: [cat, score].filter(Boolean).join(" "),
                     link: bookLink(bid),
-                    host: BASE_URL
+                    host: FANQIE_URL
                 });
             }
         }
     }
 
-    return Response.success(list, "");
+    var next = (hasMore && list.length > 0) ? String(parseInt(page, 10) + 1) : "";
+    return Response.success(list, next);
 }

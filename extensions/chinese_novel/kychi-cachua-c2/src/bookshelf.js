@@ -47,7 +47,7 @@ function execute(url, page) {
                             description: decodeText(cleanText(b.abstract || "")),
                             detail: decodeText(b.category || ""),
                             link: bookLink(b.book_id),
-                            host: BASE_URL
+                            host: FANQIE_URL
                         });
                     }
                 });
