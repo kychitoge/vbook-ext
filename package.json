@@ -20,11 +20,15 @@
     "ext:create:dry": "node tools/cli/index.js ext --mode create --name DemoExt --source https://example.com --author kychi --dry-run",
     "build:ext": "node tools/cli/index.js build --plugin extensions/novel/kychi_ntruyen",
     "build:catalog": "node tools/cli/index.js build-catalog",
+    "build:vsix": "node tools/build-vsix.js",
     "ref:sync": "node tools/cli/index.js sync-ref",
     "encrypt:obfuscate": "node tools/encrypt/obfuscate.js",
     "encrypt:aes": "node tools/encrypt/encrypt.js",
     "encrypt:pipeline": "node tools/encrypt/pipeline.js",
-    "encrypt:truyencv": "node tools/encrypt/pipeline.js extensions/novel/kychi_truyencv"
+    "encrypt:remote": "node tools/encrypt/remote-encrypt.js",
+    "encrypt:truyencv": "node tools/encrypt/pipeline.js extensions/novel/kychi_truyencv",
+    "test:local": "node tools/cli/local-runner.js",
+    "test-all:local": "node tools/cli/index.js device test-all --no-connect"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

@@ -184,11 +184,36 @@ program.command('device')
         new Command('test-all')
             .description('One-click test (home -> gen -> detail -> toc -> chap)')
             .option('--plugin <path>', 'Extension folder path')
+            .option('--no-connect', 'Run offline simulation without connecting to device')
+            .option('--local', 'Run offline simulation without connecting to device')
             .action(async (subOptions, ...rest) => {
                 const command = rest[rest.length - 1];
+                if (subOptions.connect === false || subOptions.local) {
+                    const { runLocalTestAll } = require('./local-runner');
+                    try {
+                        await runLocalTestAll(subOptions.plugin || '.');
+                    } catch (err) {
+                        console.error('\n[ERROR]', err.message);
+                        process.exitCode = 1;
+                    }
+                    return;
+                }
                 const success = await handleDeviceTestAll(subOptions, command.parent);
                 if (!success) process.exitCode = 1;
             })
     );
+
+program.command('test-local')
+    .description('One-click test an extension locally without connecting to device')
+    .argument('[plugin-path]', 'Extension folder path', '.')
+    .action(async (pluginPath) => {
+        const { runLocalTestAll } = require('./local-runner');
+        try {
+            await runLocalTestAll(pluginPath);
+        } catch (err) {
+            console.error('\n[ERROR]', err.message);
+            process.exitCode = 1;
+        }
+    });
 
 program.parse(process.argv);
