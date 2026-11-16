@@ -28,7 +28,7 @@ https://raw.githubusercontent.com/kychitoge/vbook-ext/main/plugin.json
 | Icon | Tên | Nguồn | Phiên bản | Loại | Ngôn ngữ |
 | :---: | :--- | :--- | :---: | :---: | :---: |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/chinese_novel/sangtacviet-app/icon.png" width="40"> | **[APP] Sáng Tác Việt** | [sangtacviet.pro](https://sangtacviet.pro) | 2 | novel | vi_VN |
-| <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyencv/icon.png" width="40"> | **[APP] Truyện CV** | [truyencv.io](https://truyencv.io) | 2 | novel | vi_VN |
+| <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyencv/icon.png" width="40"> | **[APP] Truyện CV** | [truyencv.io](https://truyencv.io) | 3 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_vivutruyen/icon.png" width="40"> | **Vivu Truyện** | [vivutruyen.net](https://vivutruyen.net/) | 1 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-tiemtruyenchu/icon.png" width="40"> | **Tiệm Truyện Chữ** | [tiemtruyenchu.com](https://tiemtruyenchu.com) | 1 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/zuminovel/icon.png" width="40"> | **Zumi Novel** | [zuminovel.com](https://zuminovel.com/) | 1 | novel | vi_VN |

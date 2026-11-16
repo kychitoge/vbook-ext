@@ -2,26 +2,32 @@
   "metadata": {
     "name": "[APP] Truyện CV",
     "author": "kychi",
-    "version": 2,
+    "version": 3,
     "source": "https://truyencv.io",
     "regexp": "(www\\.)?truyencv\\.io/.*",
-    "description": "Đọc truyện từ App TruyenCV.\n\n HƯỚNG DẪN SỬ DỤNG :\n Nhập tài khoản mật khẩu ở setting để login. (không login cũng được) \n\n Trong trường hợp TruyenCv không muốn ext này tồn tại, vui lòng liên hệ, mình cam kết tiếp nhận và gỡ bỏ trong 24h làm việc. \n\n Hoan hỷ nhé :)))))",
+    "description": "Đọc truyện từ App TruyenCV.\n\n HƯỚNG DẪN SỬ DỤNG :\n Nhập tài khoản mật khẩu để login\n\n Trong trường hợp TruyenCv không muốn ext này tồn tại, vui lòng liên hệ, mình cam kết tiếp nhận và gỡ bỏ trong 24h làm việc. \n\n Hoan hỷ nhé :)))))",
     "locale": "vi_VN",
     "language": "javascript",
     "type": "novel",
     "encrypt": true
   },
   "script": {
-    "home": "home.bundle.js",
-    "gen": "gen.bundle.js",
-    "genre": "genre.bundle.js",
-    "search": "search.bundle.js",
-    "detail": "detail.bundle.js",
-    "page": "page.bundle.js",
-    "toc": "toc.bundle.js",
-    "chap": "chap.bundle.js"
+    "home": "home.js",
+    "gen": "gen.js",
+    "genre": "genre.js",
+    "search": "search.js",
+    "detail": "detail.js",
+    "page": "page.js",
+    "toc": "toc.js",
+    "chap": "chap.js"
   },
   "config": {
+    "DOMAIN": {
+      "title": "Domain",
+      "default": "https://truyencv.io",
+      "mode": "input",
+      "format": "text"
+    },
     "USER_EMAIL": {
       "title": "Email đăng nhập",
       "mode": "input"
