@@ -4,7 +4,6 @@ const { checkExtensionZipIntegrity } = require('../build/build');
 
 function handleVerifyCommand(options, workspaceRoot) {
     const extRoot = path.join(workspaceRoot, 'extensions');
-    const catalogPluginPath = path.join(extRoot, 'plugin.json');
     const rootPluginPath = path.join(workspaceRoot, 'plugin.json');
     const types = ['novel', 'comic', 'video', 'audio', 'chinese_novel', 'translate', 'tts'];
     
@@ -13,18 +12,13 @@ function handleVerifyCommand(options, workspaceRoot) {
 
     let overallSuccess = true;
 
-    // 1. Check catalogs
-    const hasCatalogPlugin = fs.existsSync(catalogPluginPath);
+    // 1. Check root catalog
     const hasRootPlugin = fs.existsSync(rootPluginPath);
 
-    if (!hasCatalogPlugin) {
-        console.warn('[WARNING] extensions/plugin.json is missing.');
-    }
     if (!hasRootPlugin) {
         console.warn('[WARNING] root plugin.json is missing. This is your public catalog.');
     }
 
-    const catalogPlugin = hasCatalogPlugin ? JSON.parse(fs.readFileSync(catalogPluginPath, 'utf8')) : {};
     const rootPlugin = hasRootPlugin ? JSON.parse(fs.readFileSync(rootPluginPath, 'utf8')) : {};
     const rootData = Array.isArray(rootPlugin.data) ? rootPlugin.data : [];
 
@@ -44,13 +38,11 @@ function handleVerifyCommand(options, workspaceRoot) {
         folders.forEach(folder => {
             totalExts++;
             const relPath = `extensions/${type}/${folder}`;
-            const inCatalog = catalogPlugin[type] && catalogPlugin[type].some(e => e.relativePath === relPath);
             const inRoot = rootData.some(e => e.path && e.path.includes(relPath));
             
             const integrity = checkExtensionZipIntegrity(workspaceRoot, relPath);
             
             let issues = [];
-            if (!inCatalog) issues.push('NOT_IN_CATALOG');
             if (!inRoot) issues.push('NOT_IN_ROOT');
             if (!integrity.exists) issues.push('MISSING_ZIP');
             else if (!integrity.upToDate) issues.push('OUTDATED_ZIP');
