@@ -2,23 +2,29 @@
   "metadata": {
     "name": "Zumi Novel",
     "author": "kychi",
-    "version": 1,
-    "source": "https://zuminovel.com/",
-    "regexp": "(www.)?zuminovel.com/novel/[^/]+/?$",
+    "version": 2,
+    "source": "https://zuminovel.com",
+    "regexp": "(https?://)?(www\\.)?zuminovel\\.com/novel/[^/]+/?$",
     "description": "Đọc tiểu thuyết từ zuminovel.com",
     "locale": "vi_VN",
-    "language": "javascript",
-    "type": "novel"
+    "type": "novel",
+    "language":"javascript",
+    "nsfw": false
   },
   "script": {
     "home": "home.js",
-    "page": "page.js",
     "genre": "genre.js",
-    "gen": "gen.js",
+    "search": "search.js",
     "detail": "detail.js",
     "toc": "toc.js",
-    "chap": "chap.js",
-    "search": "search.js",
-    "comment": "comment.js"
+    "chap": "chap.js"
+  },
+  "config": {
+    "DOMAIN": {
+      "title": "Domain",
+      "default": "https://zuminovel.com",
+      "mode": "input",
+      "format": "text"
+    }
   }
 }
