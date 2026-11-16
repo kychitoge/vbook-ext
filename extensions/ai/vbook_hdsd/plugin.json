@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "name": "HDSD AI",
+    "author": "vbook",
+    "version": 2,
+    "source": "https://vbookapp.gitbook.io/huong-dan-su-dung",
+    "regexp": "",
+    "description": "Trợ lý tra cứu hướng dẫn sử dụng vBook trực tiếp từ tài liệu chính thức",
+    "locale": "vi_VN",
+    "type": "ai"
+  },
+  "script": {
+    "chatStream": "chat_stream.js"
+  },
+  "config": {}
+}
