@@ -52,10 +52,10 @@
       "name": "TruyenTv",
       "author": "kychi",
       "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyentv/plugin.zip",
-      "version": 7,
-      "source": "https://www.tvtruyen.cc/",
+      "version": 8,
+      "source": "https://www.tvtruyen1.com",
       "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyentv/icon.png",
-      "description": "Đọc truyện từ TruyenTv (www.tvtruyen.cc).\n\nv7: Bổ sung tab Lưu ý bật VPN 1.1.1.1.\n\n⚙️ TÙY CHỈNH DOMAIN:\nTrang này hay đổi domain. Nếu link chết, kéo xuống dưới nhập URL mới vào ô bên dưới (VD: https://www.tvtruyen.cc)",
+      "description": "Đọc truyện chữ từ TruyenTv. Nếu tên miền mặc định không truy cập được, bạn có thể nhập địa chỉ mới trong phần cài đặt.",
       "type": "novel",
       "locale": "vi_VN"
     },

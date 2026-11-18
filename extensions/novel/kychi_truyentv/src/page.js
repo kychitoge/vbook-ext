@@ -1,44 +1,36 @@
-load('config.js');
+load("config.js");
+
 function execute(url) {
     url = normalizeUrl(url);
-    var response = fetchPage(url);
+    let response = fetchPage(url);
     if (!response.ok) {
-        return Response.error('Không tải được thông tin phân trang');
+        return Response.error("Không thể tải danh sách trang mục lục (HTTP " + response.status + "). Kiểm tra kết nối mạng hoặc tên miền trong cài đặt, rồi thử lại.");
     }
-    
-    var doc = response.html();
-    var data = [];
-    
-    // Extensively match pagination anchors in both desktop and mobile structures
-    var anchors = doc.select('#list-chapter .pagination a, #list-chapter .custom-pagination-list a, #mobile-list-chapter .pagination a, .custom-pagination-list a, .pagination a');
-    
-    var lastPage = 1;
-    for (var i = 0; i < anchors.size(); i++) {
-        var a = anchors.get(i);
-        if (a) {
-            var href = a.attr('href');
-            if (href) {
-                var match = href.match(/page=(\d+)/);
-                if (match) {
-                    var pNum = parseInt(match[1], 10);
-                    if (pNum > lastPage) lastPage = pNum;
-                }
-            }
+
+    let doc = response.html();
+    let data = [];
+    let anchors = doc.select("#list-chapter .pagination a, #list-chapter .custom-pagination-list a, #mobile-list-chapter .pagination a, .custom-pagination-list a, .pagination a");
+
+    let lastPage = 1;
+    for (let i = 0; i < anchors.size(); i++) {
+        let a = anchors.get(i);
+        if (!a) continue;
+        let href = a.attr("href") + "";
+        if (!href) continue;
+        let match = href.match(/page=(\d+)/);
+        if (match) {
+            let pNum = parseInt(match[1], 10);
+            if (pNum > lastPage) lastPage = pNum;
         }
     }
-    
-    // Populate chapter list page URLs
-    for (var p = 1; p <= lastPage; p++) {
+
+    for (let p = 1; p <= lastPage; p++) {
         if (p === 1) {
             data.push(url);
         } else {
-            if (url.indexOf('?') >= 0) {
-                data.push(url + '&page=' + p);
-            } else {
-                data.push(url + '?page=' + p);
-            }
+            data.push(url + (url.indexOf("?") >= 0 ? "&" : "?") + "page=" + p);
         }
     }
-    
+
     return Response.success(data);
 }

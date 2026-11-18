@@ -2,13 +2,15 @@
   "metadata": {
     "name": "TruyenTv",
     "author": "kychi",
-    "version": 7,
-    "source": "https://www.tvtruyen.cc/",
-    "regexp": "(https?:\\/\\/)?(www\\.)?tvtruyen\\.[a-z]{2,}\\/[^/]+$",
-    "description": "Đọc truyện từ TruyenTv (www.tvtruyen.cc).\n\nv7: Bổ sung tab Lưu ý bật VPN 1.1.1.1.\n\n⚙️ TÙY CHỈNH DOMAIN:\nTrang này hay đổi domain. Nếu link chết, kéo xuống dưới nhập URL mới vào ô bên dưới (VD: https://www.tvtruyen.cc)",
+    "version": 8,
+    "source": "https://www.tvtruyen1.com",
+    "regexp": "(https?:\\/\\/)?(www\\.)?tvtruyen1\\.[a-z]{2,}\\/[^/]+\\/?$",
+    "description": "Đọc truyện chữ từ TruyenTv. Nếu tên miền mặc định không truy cập được, bạn có thể nhập địa chỉ mới trong phần cài đặt.",
     "locale": "vi_VN",
     "language": "javascript",
-    "type": "novel"
+    "type": "novel",
+    "nsfw": false,
+    "encrypt": true
   },
   "script": {
     "home": "home.js",
@@ -22,11 +24,12 @@
     "comment": "comment.js"
   },
   "config": {
-    "CONFIG_URL": {
-      "title": "🌐 URL Domain tùy chỉnh",
-      "description": "Nhập URL mới nếu domain mặc định bị chặn hoặc đổi. VD: https://www.tvtruyen.cc\nĐể trống để dùng mặc định.",
+    "DOMAIN": {
+      "title": "Tên miền tùy chỉnh",
+      "description": "Nhập URL mới khi trang web thay đổi địa chỉ, chẳng hạn https://www.tvtruyen1.com. Để trống để dùng địa chỉ mặc định.",
       "mode": "input",
-      "default": ""
+      "format": "text",
+      "default": "https://www.tvtruyen1.com"
     }
   }
 }

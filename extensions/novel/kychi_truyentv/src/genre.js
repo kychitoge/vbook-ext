@@ -1,4 +1,5 @@
-load('config.js');
+load("config.js");
+
 function execute() {
     return Response.success([
         { title: "Ngôn Tình", input: BASE_URL + "/the-loai/ngon-tinh.html", script: "gen.js" },
