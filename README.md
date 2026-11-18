@@ -33,7 +33,7 @@ https://raw.githubusercontent.com/kychitoge/vbook-ext/main/plugin.json
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/zuminovel/icon.png" width="40"> | **Zumi Novel** | [zuminovel.com](https://zuminovel.com) | 2 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyentv/icon.png" width="40"> | **TruyenTv** | [tvtruyen.cc](https://www.tvtruyen.cc/) | 7 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi-audiotruyenfull/icon.png" width="40"> | **Audio Truyện Full** | [vip.audiotruyenfull.org](https://vip.audiotruyenfull.org/) | 1 | novel | vi_VN |
-| <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyenmo/icon.png" width="40"> | **Truyện Mơ** | [truyenmo.xyz](https://www.truyenmo.xyz/) | 4 | novel | vi_VN |
+| <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyenmo/icon.png" width="40"> | **Truyện Mơ** | [truyenmo.one](https://truyenmo.one) | 5 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_ntruyen/icon.png" width="40"> | **nTruyen** | [sstruyen.pics](https://sstruyen.pics/) | 13 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/kychi_truyenmoi/icon.png" width="40"> | **Truyện Mới** | [truyenmoiqq.com](https://truyenmoiqq.com/) | 7 | novel | vi_VN |
 | <img src="https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/novel/truyenhoan/icon.png" width="40"> | **Truyện Hoàn** | [truyenhoan.com](https://truyenhoan.com/) | 9 | novel | vi_VN |
