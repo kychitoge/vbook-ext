@@ -73,8 +73,31 @@ function cleanDescription(htm) {
 function parseBookList(doc) {
     let data = [];
     let seen = {};
+    let root = doc.select(".col-truyen-main").first();
+    if (!root) root = doc;
 
-    let comicCards = doc.select(".comic-card");
+    let infoCards = root.select(".info-mobile-card");
+    for (let k = 0; k < infoCards.size(); k++) {
+        let e3 = infoCards.get(k);
+        let a3 = e3.select(".name a").first();
+        if (!a3) continue;
+
+        let name3 = cleanText(a3.attr("title") || a3.text());
+        let link3 = a3.attr("href");
+        if (!name3 || !link3) continue;
+        let fullLink3 = normalizeUrl(link3);
+        if (seen[fullLink3]) continue;
+        seen[fullLink3] = true;
+
+        let img3 = e3.select(".info-image img, img").first();
+        let cover3 = img3 ? (img3.attr("src") || img3.attr("data-src") || img3.attr("data-image") || "") + "" : "";
+        let authorEl3 = e3.select(".author a, .author").first();
+        let author3 = authorEl3 ? cleanText(authorEl3.text()) : "";
+
+        data.push({ name: name3, link: fullLink3, cover: cover3, description: author3, host: BASE_URL });
+    }
+
+    let comicCards = root.select(".comic-card");
     for (let i = 0; i < comicCards.size(); i++) {
         let e = comicCards.get(i);
         let a = e.select(".comic-title a, a[itemprop='url']").first();
@@ -97,7 +120,7 @@ function parseBookList(doc) {
         data.push({ name: name, link: fullLink, cover: cover, description: author, host: BASE_URL });
     }
 
-    let listRows = doc.select(".list-truyen .row, .list-new .row, .col-truyen-main .row");
+    let listRows = root.select(".list-truyen .row, .list-new .row, .row");
     for (let j = 0; j < listRows.size(); j++) {
         let e2 = listRows.get(j);
         let a2 = e2.select(".home-new-comic-title a, .col-title a, a[itemprop='url']").first();
@@ -120,26 +143,15 @@ function parseBookList(doc) {
         data.push({ name: name2, link: fullLink2, cover: "", description: desc, host: BASE_URL });
     }
 
-    let infoCards = doc.select(".info-mobile-card");
-    for (let k = 0; k < infoCards.size(); k++) {
-        let e3 = infoCards.get(k);
-        let a3 = e3.select(".name a").first();
-        if (!a3) continue;
-
-        let name3 = cleanText(a3.attr("title") || a3.text());
-        let link3 = a3.attr("href");
-        if (!name3 || !link3) continue;
-        let fullLink3 = normalizeUrl(link3);
-        if (seen[fullLink3]) continue;
-        seen[fullLink3] = true;
-
-        let img3 = e3.select(".info-image img, img").first();
-        let cover3 = img3 ? (img3.attr("src") || img3.attr("data-src") || img3.attr("data-image") || "") + "" : "";
-        let authorEl3 = e3.select(".author a, .author").first();
-        let author3 = authorEl3 ? cleanText(authorEl3.text()) : "";
-
-        data.push({ name: name3, link: fullLink3, cover: cover3, description: author3, host: BASE_URL });
-    }
-
     return data;
+}
+
+function extractNextPage(doc, currentPage) {
+    let root = doc.select(".col-truyen-main").first();
+    if (!root) root = doc;
+    let nextEl = root.select(".custom-pagination-wrapper a[rel='next'], .pagination a[rel='next'], .custom-pagination-list .nav-next a, .pagination .nav-next a, .pagination li.active + li a").first();
+    if (!nextEl) return "";
+    let href = nextEl.attr("href") + "";
+    let match = href.match(/page=(\d+)/);
+    return match ? match[1] : String(parseInt(currentPage, 10) + 1);
 }

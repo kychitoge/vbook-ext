@@ -2,7 +2,7 @@
   "metadata": {
     "name": "TruyenTv",
     "author": "kychi",
-    "version": 8,
+    "version": 9,
     "source": "https://www.tvtruyen1.com",
     "regexp": "(https?:\\/\\/)?(www\\.)?tvtruyen1\\.[a-z]{2,}\\/[^/]+\\/?$",
     "description": "Đọc truyện chữ từ TruyenTv. Nếu tên miền mặc định không truy cập được, bạn có thể nhập địa chỉ mới trong phần cài đặt.",

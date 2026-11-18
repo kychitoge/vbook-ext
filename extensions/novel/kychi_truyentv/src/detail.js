@@ -133,7 +133,7 @@ function execute(url) {
                   lowerStatus.indexOf("complete") === -1;
 
     let suggests = [];
-    if (authorUrl) {
+    if (authorUrl && author !== "Đang cập nhật" && authorUrl.indexOf("/tac-gia/dang-cap-nhat") === -1) {
         suggests.push({
             title: "Truyện cùng tác giả",
             input: normalizeUrl(authorUrl),

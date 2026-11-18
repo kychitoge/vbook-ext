@@ -74,6 +74,9 @@ function execute(url) {
     }
 
     if (chapters.length === 0) {
+        if (url.indexOf("page=") >= 0) {
+            return Response.success([]);
+        }
         return Response.error("Không tìm thấy chương nào trên trang này. Cấu trúc mục lục của nguồn có thể đã thay đổi.");
     }
 
@@ -106,11 +109,12 @@ function execute(url) {
 }
 
 function extractChapterNumber(item) {
-    let text = (item.name || "") + " " + (item.url || "");
+    let name = item.name || "";
+    let slug = (item.url || "").split("/").pop() || "";
+    let text = name + " " + slug;
     let m = text.match(/chuong[-\s]*(\d+)/i);
     if (!m) m = text.match(/chap[-\s]*(\d+)/i);
-    if (!m) m = text.match(/\/chuong-(\d+)/i);
-    if (!m) m = text.match(/(\d+)/);
+    if (!m) m = name.match(/(\d+)/);
     if (!m) return -1;
     return parseInt(m[1], 10);
 }

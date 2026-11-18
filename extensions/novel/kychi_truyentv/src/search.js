@@ -32,15 +32,7 @@ function execute(query, page) {
     let doc = response.html();
     let data = parseBookList(doc);
 
-    let next = "";
-    if (data.length > 0) {
-        let nextEl = doc.select(".pagination .nav-next a, .custom-pagination-list .nav-next a").first();
-        if (nextEl) {
-            let href = nextEl.attr("href") + "";
-            let match = href.match(/page=(\d+)/);
-            next = match ? match[1] : String(parseInt(page, 10) + 1);
-        }
-    }
+    let next = data.length > 0 ? extractNextPage(doc, page) : "";
 
     return Response.success(data, next);
 }
