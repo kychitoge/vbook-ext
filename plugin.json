@@ -283,10 +283,10 @@
       "name": "NguonC",
       "author": "kychi",
       "path": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/video/kychi_nguonc/plugin.zip",
-      "version": 2,
+      "version": 3,
       "source": "https://phim.nguonc.com",
       "icon": "https://raw.githubusercontent.com/kychitoge/vbook-ext/main/extensions/video/kychi_nguonc/icon.png",
-      "description": "Xem phim từ NguonC - dùng proxy",
+      "description": "Xem phim từ NguonC (hỗ trợ phát qua webview)",
       "type": "video",
       "locale": "vi_VN"
     },

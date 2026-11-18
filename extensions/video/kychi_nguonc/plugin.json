@@ -2,28 +2,28 @@
   "metadata": {
     "name": "NguonC",
     "author": "kychi",
-    "version": 2,
+    "version": 3,
     "source": "https://phim.nguonc.com",
-    "regexp": "(www\\.)?phim\\.nguonc\\.com/phim/.*",
-    "description": "Xem phim từ NguonC - dùng proxy",
+    "regexp": "(https?://)?(www\\.)?phim\\.nguonc\\.com/phim/.+",
+    "description": "Xem phim từ NguonC (hỗ trợ phát qua webview)",
     "locale": "vi_VN",
     "type": "video",
-    "language": "javascript"
+    "nsfw": false,
+    "encrypt": true
   },
   "script": {
     "home": "home.js",
     "genre": "genre.js",
-    "detail": "detail.js",
     "search": "search.js",
+    "detail": "detail.js",
     "toc": "toc.js",
     "chap": "chap.js",
     "track": "track.js"
   },
   "config": {
-    "PROXY_URL": {
-      "title": "Proxy URL (@kyctg)",
-      "subtitle": "Địa chỉ Cloudflare Worker Proxy giải mã luồng video",
-      "default": "",
+    "DOMAIN": {
+      "title": "Domain",
+      "default": "https://phim.nguonc.com",
       "mode": "input",
       "format": "text"
     }

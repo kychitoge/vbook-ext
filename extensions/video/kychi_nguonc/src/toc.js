@@ -2,63 +2,63 @@ load('config.js');
 
 function execute(url) {
     url = normalizeUrl(url);
-    var slug = url.split('/').pop();
-    var apiUrl = BASE_URL + "/api/film/" + slug;
+    let slug = url.split("/").pop().split("?")[0].split("#")[0];
+    if (!slug) return Response.error("URL phim không hợp lệ");
 
-    var response = fetch(apiUrl);
-    if (response.ok) {
-        var resJson = response.json();
-        var movie = resJson.movie || (resJson.data && resJson.data.movie);
-        if (!movie) return Response.error("Không tìm thấy dữ liệu phim");
-        
-        var episodesData = movie.episodes || []; 
-        var list = [];
+    let apiUrl = BASE_URL + "/api/film/" + slug;
+    let response = fetch(apiUrl, {
+        headers: defaultHeaders(BASE_URL + "/")
+    });
+    if (!response.ok) return Response.error("HTTP " + response.status);
 
-        var serversWithData = episodesData.filter(function(server) {
-            return server.items && Array.isArray(server.items) && server.items.some(function(item) {
-                return item.embed; // Chỉ quan tâm đến link embed
+    let resJson = response.json();
+    let movie = resJson.movie || (resJson.data && resJson.data.movie);
+    if (!movie) return Response.error("Không tìm thấy dữ liệu phim");
+
+    let episodesData = Array.isArray(movie.episodes) ? movie.episodes : [];
+    let list = [];
+
+    let serversWithData = episodesData.filter(function (server) {
+        return server && Array.isArray(server.items) && server.items.some(function (item) {
+            return item && item.embed;
+        });
+    }).length;
+
+    let hasMultipleServers = serversWithData > 1;
+
+    episodesData.forEach(function (server) {
+        if (!server || !Array.isArray(server.items)) return;
+        let serverName = server.server_name || "Nguồn";
+        let epItems = [];
+
+        server.items.forEach(function (item) {
+            if (!item || !item.embed) return;
+            let name = item.name ? String(item.name).trim() : "";
+            let epName = name || "Tập";
+
+            if (name && !isNaN(name) && name.toLowerCase().indexOf("tập") === -1) {
+                epName = "Tập " + name;
+            }
+
+            epItems.push({
+                name: epName,
+                url: String(item.embed).trim(),
+                description: "",
+                lock: false,
+                pay: false
             });
-        }).length;
+        });
 
-        var hasMultipleServers = serversWithData > 1;
-
-        if (Array.isArray(episodesData)) {
-            episodesData.forEach(function(server) {
-                var serverName = server.server_name || "Nguồn";
-                var epItems = [];
-
-                if (server.items && Array.isArray(server.items)) {
-                    server.items.forEach(function(item) {
-                        var streamUrl = item.embed; // Chỉ dùng link embed
-                        if (streamUrl) {
-                            var name = item.name || "";
-                            var epName = name;
-                            
-                            if (name && !isNaN(name) && name.toLowerCase().indexOf("tập") === -1) {
-                                epName = "Tập " + name;
-                            }
-
-                            epItems.push({
-                                name: epName,
-                                url: streamUrl,
-                                host: BASE_URL
-                            });
-                        }
-                    });
-                }
-
-                if (epItems.length > 0) {
-                    if (hasMultipleServers) {
-                        list.push({
-                            name: serverName,
-                            type: "section"
-                        });
-                    }
-                    list = list.concat(epItems);
-                }
-            });
+        if (epItems.length > 0) {
+            if (hasMultipleServers) {
+                list.push({
+                    name: serverName,
+                    type: "section"
+                });
+            }
+            list = list.concat(epItems);
         }
-        return Response.success(list);
-    }
-    return Response.error("Không lấy được danh sách tập phim");
+    });
+
+    return Response.success(list);
 }

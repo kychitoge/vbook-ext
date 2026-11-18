@@ -2,101 +2,137 @@ load('config.js');
 
 function execute(url) {
     url = normalizeUrl(url);
-    var slug = url.split('/').pop();
-    var apiUrl = BASE_URL + "/api/film/" + slug;
+    let slug = url.split("/").pop().split("?")[0].split("#")[0];
+    if (!slug) return Response.error("URL phim không hợp lệ");
 
-    var response = fetch(apiUrl);
-    if (response.ok) {
-        var resJson = response.json();
-        var movie = resJson.movie || (resJson.data && resJson.data.movie);
-        if (movie) {
-            var suggests = [];
-            var infoText = "";
-            infoText += "Tên gốc: " + (movie.original_name || movie.origin_name) + "<br>";
-            infoText += "Trạng thái: " + (movie.current_episode || "Đang cập nhật") + " / " + (movie.total_episodes || "??") + "<br>";
-            infoText += "Chất lượng: " + (movie.quality || "") + " " + (movie.language || "") + "<br>";
-            if (movie.time && movie.time !== "null") infoText += "Thời lượng: " + movie.time + "<br>";
-            if (movie.director && movie.director !== "N/A") infoText += "Đạo diễn: " + movie.director + "<br>";
-            if (movie.casts && movie.casts !== "N/A") infoText += "Diễn viên: " + movie.casts + "<br>";
+    let apiUrl = BASE_URL + "/api/film/" + slug;
+    let response = fetch(apiUrl, {
+        headers: defaultHeaders(BASE_URL + "/")
+    });
+    if (!response.ok) return Response.error("HTTP " + response.status);
 
-            if (movie.category) {
-                var categories = movie.category;
-                // Group 1: Định dạng
-                if (categories["1"] && categories["1"].list) {
-                    var formats = categories["1"].list.map(function(item) { return item.name; });
-                    if (formats.length > 0) infoText += "Định dạng: " + formats.join(", ") + "<br>";
+    let resJson = response.json();
+    let movie = resJson.movie || (resJson.data && resJson.data.movie);
+    if (!movie) return Response.error("Không tìm thấy thông tin phim");
+
+    let genres = [];
+    let suggests = [];
+    let infoParts = [];
+
+    let originalName = movie.original_name || movie.origin_name;
+    if (originalName) infoParts.push("Tên gốc: " + originalName);
+    infoParts.push("Trạng thái: " + (movie.current_episode || "Đang cập nhật") + " / " + (movie.total_episodes || "?"));
+    let quality = ((movie.quality || "") + " " + (movie.language || "")).trim();
+    if (quality) infoParts.push("Chất lượng: " + quality);
+    if (movie.time && movie.time !== "null") infoParts.push("Thời lượng: " + movie.time);
+    if (movie.director && movie.director !== "N/A") infoParts.push("Đạo diễn: " + movie.director);
+    if (movie.casts && movie.casts !== "N/A") infoParts.push("Diễn viên: " + movie.casts);
+
+    if (movie.category) {
+        let categories = movie.category;
+
+        if (categories["1"] && Array.isArray(categories["1"].list)) {
+            let formats = categories["1"].list.map(function (item) { return item.name; }).filter(Boolean);
+            if (formats.length > 0) infoParts.push("Định dạng: " + formats.join(", "));
+        }
+
+        if (categories["2"] && Array.isArray(categories["2"].list)) {
+            let genresList = categories["2"].list;
+            let genreNames = [];
+            genresList.forEach(function (item) {
+                if (!item || !item.name) return;
+                genreNames.push(item.name);
+                let gSlug = item.slug || slugifyCategory(item.name);
+                if (gSlug) {
+                    genres.push({
+                        title: item.name,
+                        input: "/api/films/the-loai/" + gSlug,
+                        script: "search.js"
+                    });
                 }
-                // Group 2: Thể loại
-                if (categories["2"] && categories["2"].list) {
-                    var genresList = categories["2"].list;
-                    var genres = genresList.map(function(item) { return item.name; });
-                    if (genres.length > 0) {
-                        infoText += "Thể loại: " + genres.join(", ") + "<br>";
-                        // Suggest theo thể loại đầu tiên
-                        var firstGenre = genresList[0];
-                        var genreSlug = firstGenre.slug || firstGenre.id;
-                        if (genreSlug) {
-                            suggests.push({
-                                title: "Cùng thể loại: " + firstGenre.name,
-                                input: BASE_URL + "/api/films/the-loai/" + genreSlug,
-                                script: "gen.js"
-                            });
-                        }
-                    }
-                }
-                // Group 3: Năm
-                if (categories["3"] && categories["3"].list) {
-                    var yearsList = categories["3"].list;
-                    var years = yearsList.map(function(item) { return item.name; });
-                    if (years.length > 0) {
-                        infoText += "Năm: " + years.join(", ") + "<br>";
-                        var yearName = yearsList[0].name;
-                        suggests.push({
-                            title: "Phim cùng năm " + yearName,
-                            input: BASE_URL + "/api/films/nam-phat-hanh/" + yearName,
-                            script: "gen.js"
-                        });
-                    }
-                }
-                // Group 4: Quốc gia
-                if (categories["4"] && categories["4"].list) {
-                    var countriesList = categories["4"].list;
-                    var countries = countriesList.map(function(item) { return item.name; });
-                    if (countries.length > 0) {
-                        infoText += "Quốc gia: " + countries.join(", ") + "<br>";
-                        var countrySlug = countriesList[0].slug;
-                        suggests.push({
-                            title: "Phim cùng quốc gia: " + countriesList[0].name,
-                            input: BASE_URL + "/api/films/quoc-gia/" + countrySlug,
-                            script: "gen.js"
-                        });
-                    }
-                }
-            }
-
-            var ongoing = true;
-            var status = (movie.status || "").toLowerCase();
-            if (status === "completed" || status === "hoanthanh" || status === "hoàn thành") {
-                ongoing = false;
-            }
-
-            var format = "movie";
-            if (movie.total_episodes && (parseInt(movie.total_episodes) > 1 || isNaN(parseInt(movie.total_episodes)))) {
-                format = "series";
-            }
-
-            return Response.success({
-                name: movie.name,
-                cover: movie.thumb_url || movie.poster_url,
-                author: (movie.director && movie.director !== "N/A") ? movie.director : "Đang cập nhật",
-                description: movie.description ? movie.description.replace(/<[^>]*>/g, '') : "",
-                detail: infoText,
-                ongoing: ongoing,
-                format: format,
-                suggests: suggests,
-                host: "https://phim.nguonc.com"
             });
+            if (genreNames.length > 0) {
+                infoParts.push("Thể loại: " + genreNames.join(", "));
+                let firstGenre = genresList[0];
+                let firstGenreSlug = firstGenre && (firstGenre.slug || slugifyCategory(firstGenre.name));
+                if (firstGenreSlug) {
+                    suggests.push({
+                        title: "Cùng thể loại: " + firstGenre.name,
+                        input: "/api/films/the-loai/" + firstGenreSlug,
+                        script: "search.js"
+                    });
+                }
+            }
+        }
+
+        if (categories["3"] && Array.isArray(categories["3"].list)) {
+            let yearsList = categories["3"].list;
+            let years = yearsList.map(function (item) { return item.name; }).filter(Boolean);
+            if (years.length > 0) {
+                infoParts.push("Năm: " + years.join(", "));
+                suggests.push({
+                    title: "Phim cùng năm " + years[0],
+                    input: "/api/films/nam-phat-hanh/" + years[0],
+                    script: "search.js"
+                });
+            }
+        }
+
+        if (categories["4"] && Array.isArray(categories["4"].list)) {
+            let countriesList = categories["4"].list;
+            let countryNames = [];
+            countriesList.forEach(function (item) {
+                if (!item || !item.name) return;
+                countryNames.push(item.name);
+                let cSlug = item.slug || slugifyCategory(item.name);
+                if (cSlug) {
+                    genres.push({
+                        title: item.name,
+                        input: "/api/films/quoc-gia/" + cSlug,
+                        script: "search.js"
+                    });
+                }
+            });
+            if (countryNames.length > 0) {
+                infoParts.push("Quốc gia: " + countryNames.join(", "));
+                let firstCountry = countriesList[0];
+                let firstCountrySlug = firstCountry && (firstCountry.slug || slugifyCategory(firstCountry.name));
+                if (firstCountrySlug) {
+                    suggests.push({
+                        title: "Phim cùng quốc gia: " + firstCountry.name,
+                        input: "/api/films/quoc-gia/" + firstCountrySlug,
+                        script: "search.js"
+                    });
+                }
+            }
         }
     }
-    return Response.error("Không tìm thấy thông tin phim");
+
+    let ongoing = true;
+    let status = (movie.status || "").toLowerCase();
+    let currentEp = movie.current_episode ? String(movie.current_episode).toLowerCase().trim() : "";
+    if (status === "completed" || status === "hoanthanh" || status === "hoàn thành") {
+        ongoing = false;
+    } else if (currentEp === "full" || currentEp.indexOf("hoàn tất") !== -1) {
+        ongoing = false;
+    }
+
+    let cover = normalizeImageUrl(movie.thumb_url || movie.poster_url);
+    let description = movie.description ? String(movie.description).replace(/<[^>]*>/g, "").trim() : "";
+
+    return Response.success({
+        name: movie.name || "",
+        author: (movie.director && movie.director !== "N/A") ? movie.director : "Đang cập nhật",
+        cover: cover,
+        description: description,
+        detail: infoParts.join("<br>"),
+        url: url,
+        type: "video",
+        format: "series",
+        ongoing: ongoing,
+        locale: "vi",
+        genres: genres,
+        suggests: suggests,
+        host: BASE_URL
+    });
 }

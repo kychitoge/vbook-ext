@@ -1,34 +1,13 @@
 load('config.js');
 
-function execute(key, page) {
-    if (!page) page = '1';
-    
-    // NguonC search API: /api/films/search?keyword={slug}
-    var fetchUrl = BASE_URL + "/api/films/search?keyword=" + encodeURIComponent(key) + "&page=" + page;
-    
-    var response = fetch(fetchUrl, {
-        headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Referer": "https://phim.nguonc.com/"
-        }
-    });
+function execute(query, page) {
+    query = query ? String(query).trim() : "";
+    page = page || "1";
 
-    if (response.ok) {
-        var json = response.json();
-        var list = parseCards(json);
-        
-        var next = null;
-        var paginate = json.paginate || (json.data && json.data.paginate);
-        if (paginate) {
-            var currentPage = parseInt(paginate.current_page || page);
-            var totalPages = parseInt(paginate.total_page || paginate.last_page || 0);
-            if (currentPage < totalPages) {
-                next = (currentPage + 1).toString();
-            }
-        }
-        
-        return Response.success(list, next);
+    if (query.indexOf("/") === 0 || query.indexOf("http") === 0) {
+        return fetchListing(query, page);
     }
-    
-    return Response.success([]);
+
+    let searchUrl = BASE_URL + "/api/films/search?keyword=" + encodeURIComponent(query);
+    return fetchListing(searchUrl, page);
 }
