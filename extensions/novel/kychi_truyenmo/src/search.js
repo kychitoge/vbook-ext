@@ -1,30 +1,31 @@
-load('config.js');
+load("config.js");
 
-function execute(keyword, page) {
-    page = page || '1';
-    keyword = String(keyword || '').trim();
-    if (!keyword) return Response.success([], '');
+function execute(query, page) {
+    query = String(query || "").trim();
+    page = String(page || "1").trim() || "1";
+    if (!query) return Response.success([], "");
 
-    var searchUrl = BASE_URL + '/tim-kiem?search=' + encodeURIComponent(keyword).replace(/%20/g, '+');
-    searchUrl = buildPageUrl(searchUrl, page);
-
-    var response = fetchPage(searchUrl);
-    if (!response.ok) return Response.error('HTTP Error: ' + response.status);
-
-    var doc = response.html();
-    if (!doc) return Response.success([], '');
-
-    var data = [];
-    var seen = {};
-
-    collectStoryCards(doc.select('.single-story-block'), data, seen);
-    collectStoryCards(doc.select('.row.product-grid > div'), data, seen);
-
-    if (!data.length) {
-        collectStoryCards(doc.select('[class*="story"]'), data, seen);
+    let targetUrl;
+    if (query.indexOf("/") === 0 || query.indexOf("http://") === 0 || query.indexOf("https://") === 0) {
+        let baseUrl = query === "/" ? BASE_URL : normalizeUrl(query);
+        targetUrl = buildPageUrl(baseUrl, page);
+    } else {
+        let searchUrl = BASE_URL + "/tim-kiem?search=" + encodeURIComponent(query).replace(/%20/g, "+");
+        targetUrl = buildPageUrl(searchUrl, page);
     }
 
-    var next = detectNextPage(doc);
+    let response = fetchPage(targetUrl);
+    if (!response.ok) return Response.error("HTTP " + response.status);
 
+    let doc = response.html();
+    if (!doc) return Response.success([], "");
+
+    let data = [];
+    let seen = {};
+
+    collectStoryCards(doc.select(".single-story-block"), data, seen);
+    collectStoryCards(doc.select(".row.product-grid > div"), data, seen);
+
+    let next = data.length > 0 ? detectNextPage(doc, page) : "";
     return Response.success(data, next);
 }

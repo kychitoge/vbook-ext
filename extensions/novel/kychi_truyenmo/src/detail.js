@@ -1,22 +1,29 @@
-load('config.js');
+load("config.js");
 
-function buildSuggests(authorUrl, firstGenreUrl, detailUrl) {
-    var suggests = [];
-    var seen = {};
+function buildSuggests(authorUrl, teamUrl, firstGenreUrl) {
+    let suggests = [];
+    let seen = {};
 
     function pushSuggest(title, input) {
+        if (suggests.length >= 2) return;
         input = normalizeUrl(input);
         if (!input || seen[input]) return;
         seen[input] = true;
         suggests.push({
             title: title,
             input: input,
-            script: 'gen.js'
+            script: "search.js"
         });
     }
 
     if (authorUrl) {
-        pushSuggest('Cùng tác giả/nhóm dịch', authorUrl);
+        pushSuggest("Cùng tác giả", authorUrl);
+    }
+    if (teamUrl) {
+        pushSuggest("Cùng nhóm dịch", teamUrl);
+    }
+    if (firstGenreUrl) {
+        pushSuggest("Cùng thể loại", firstGenreUrl);
     }
 
     return suggests;
@@ -24,140 +31,153 @@ function buildSuggests(authorUrl, firstGenreUrl, detailUrl) {
 
 function execute(url) {
     url = normalizeUrl(url);
-    var response = fetchPage(url);
-    if (!response.ok) {
-        return Response.error('HTTP Error: ' + response.status);
-    }
+    let response = fetchPage(url);
+    if (!response.ok) return Response.error("HTTP " + response.status);
 
-    // Đọc rawHtml trước, rồi parse - tránh double-read làm html() null
-    var rawHtml = response.text();
-    if (!rawHtml) return Response.error('Trang trống');
+    let rawHtml = response.text() + "";
+    if (!rawHtml) return Response.error("Trang trống");
 
-    var doc = Html.parse(rawHtml);
-    if (!doc) return Response.error('Không thể parse HTML');
+    let doc = Html.parse(rawHtml);
+    if (!doc) return Response.error("Không thể parse HTML");
 
-    var map = extractBeforeContentMap(rawHtml);
+    let map = extractBeforeContentMap(rawHtml);
 
-    // --- Tên truyện ---
-    var name = '';
-    var nameEl = doc.select('h2.card-title[itemprop="name"], h1.story-title').first();
-    if (nameEl) name = cleanText(nameEl.text());
+    let name = "";
+    let nameEl = doc.select("h2.card-title[itemprop='name'], h1.story-title").first();
+    if (nameEl) name = cleanText(nameEl.text() + "");
     if (!name) {
-        var ogTitle = doc.select('meta[property="og:title"]').first();
-        if (ogTitle) name = cleanText(ogTitle.attr('content') || '');
+        let ogTitle = doc.select("meta[property='og:title']").first();
+        if (ogTitle) name = cleanText(ogTitle.attr("content") + "");
     }
 
-    // --- Ảnh bìa ---
-    var cover = '';
-    var ogImg = doc.select('meta[property="og:image"]').first();
-    if (ogImg) cover = ogImg.attr('content') || '';
+    let cover = "";
+    let ogImg = doc.select("meta[property='og:image']").first();
+    if (ogImg) cover = (ogImg.attr("content") + "").trim();
     if (!cover) {
-        var coverEl = doc.select('.col-md-3 img.img-fluid, .card img, .book img').first();
-        if (coverEl) cover = coverEl.attr('data-src') || coverEl.attr('src') || '';
+        let coverEl = doc.select(".col-md-3 img.img-fluid, .card img, .book img").first();
+        if (coverEl) {
+            cover = ((coverEl.attr("data-src") + "") || (coverEl.attr("src") + "")).trim();
+        }
     }
-    cover = normalizeUrl(cover);
+    cover = resolveMediaUrl(cover);
 
-    // --- Mô tả ---
-    var description = '';
-    var descEl = doc.select('.story-description .inner, .story-description [itemprop="description"]').first();
+    let description = "";
+    let descEl = doc.select(".story-description .inner, .story-description [itemprop='description']").first();
     if (descEl) {
-        description = descEl.html();
+        description = descEl.html() + "";
     } else {
-        var descFallback = doc.select('.story-description').first();
-        if (descFallback) description = descFallback.html();
+        let descFallback = doc.select(".story-description").first();
+        if (descFallback) description = descFallback.html() + "";
     }
-    description = decodeObfuscatedSpan(description || '', map);
+    description = decodeObfuscatedSpan(description, map);
 
-    // --- Tác giả ---
-    var author = 'Đang cập nhật';
-    var authorUrl = '';
-    var authorEl = doc.select('a[href*="/tac-gia/"], a[href*="/nhom-dich/"]').first();
+    let author = "";
+    let authorUrl = "";
+    let authorEl = doc.select("a[href*='/tac-gia/']").first();
     if (authorEl) {
-        author = cleanText(authorEl.text()) || author;
-        authorUrl = normalizeUrl(authorEl.attr('href'));
+        author = cleanText(authorEl.text() + "");
+        authorUrl = normalizeUrl(authorEl.attr("href") + "");
     }
 
-    // --- Trạng thái ---
-    var status = 'Đang ra';
-    var statusEl = doc.select('dt:contains(Trạng thái) + dd, .label-success, .label-info, .label-warning, .label-primary').first();
-    if (statusEl) status = cleanText(statusEl.text());
+    let team = "";
+    let teamUrl = "";
+    let teamEl = doc.select("a[href*='/nhom-dich/']").first();
+    if (teamEl) {
+        team = cleanText(teamEl.text() + "");
+        teamUrl = normalizeUrl(teamEl.attr("href") + "");
+    }
 
-    var ongoing = true;
-    var statusText = String(status || '').toLowerCase();
-    if (statusText.indexOf('hoàn') >= 0 || statusText.indexOf('full') >= 0 || statusText.indexOf('đủ bộ') >= 0) {
+    if (!author) {
+        author = team || "Đang cập nhật";
+    }
+
+    let status = "Đang ra";
+    let statusEl = doc.select("dt:contains(Trạng thái) + dd").first();
+    if (!statusEl) {
+        statusEl = doc.select(".label-success, .label-info, .label-warning, .label-primary").first();
+    }
+    if (statusEl) status = cleanText(statusEl.text() + "") || status;
+
+    let ongoing = true;
+    let statusText = String(status).toLowerCase();
+    if (statusText.indexOf("hoàn") >= 0 || statusText.indexOf("full") >= 0 || statusText.indexOf("đủ bộ") >= 0) {
         ongoing = false;
-        status = 'Hoàn thành';
+        status = "Hoàn thành";
     }
 
-    // --- Thể loại ---
-    var genres = [];
-    var genreTexts = [];
-    var firstGenreUrl = '';
-    doc.select('a.cate-item[itemprop="genre"], a[itemprop="genre"]').forEach(function(a) {
-        var title = cleanText(a.text());
-        var href = normalizeUrl(a.attr('href'));
+    let genres = [];
+    let genreTexts = [];
+    let firstGenreUrl = "";
+    doc.select("a.cate-item[itemprop='genre'], a[itemprop='genre']").forEach(function (a) {
+        let title = cleanText(a.text() + "");
+        let href = normalizeUrl(a.attr("href") + "");
         if (!title || !href) return;
-        genres.push({ title: title, input: href, script: 'gen.js' });
+        genres.push({ title: title, input: href, script: "search.js" });
         genreTexts.push(title);
         if (!firstGenreUrl) firstGenreUrl = href;
     });
 
-    // --- Story ID (cho comment) ---
-    var storyId = '';
-    var storyIdEl = doc.select('#story_id, #report_story_id').first();
+    let storyId = "";
+    let storyIdEl = doc.select("#report_story_id, #story_id").first();
     if (storyIdEl) {
-        storyId = cleanText(String(storyIdEl.attr('value') || storyIdEl.text() || ''));
+        storyId = cleanText((storyIdEl.attr("value") + "") || (storyIdEl.text() + ""));
     }
     if (!storyId) {
-        var commentBtn = doc.select('#loadCommentBtn, a[onclick*="loadComments("]').first();
+        let commentBtn = doc.select("#loadCommentBtn, a[onclick*='loadComments(']").first();
         if (commentBtn) {
-            var onclick = commentBtn.attr('onclick') || '';
-            var match = onclick.match(/loadComments\((\d+)\)/);
+            let onclick = commentBtn.attr("onclick") + "";
+            let match = onclick.match(/loadComments\((\d+)\)/);
             if (match) storyId = match[1];
         }
     }
 
-    // --- Detail block ---
-    var detail = '';
-    detail += '<p><strong>Tác giả:</strong> ' + author + '</p>';
-    detail += '<p><strong>Trạng thái:</strong> ' + status + '</p>';
+    let detail = "";
+    detail += "<p><strong>Tác giả:</strong> " + author + "</p>";
+    if (team && team !== author) {
+        detail += "<p><strong>Nhóm dịch:</strong> " + team + "</p>";
+    }
+    detail += "<p><strong>Trạng thái:</strong> " + status + "</p>";
 
-    var chapterCount = 0;
-    var chapListEls = doc.select('#listChapters .list-chapters .item');
-    if (chapListEls) chapterCount = chapListEls.size();
+    let chapterCount = doc.select("#listChapters .list-chapters .item").size();
     if (!chapterCount) {
-        var totalChapEl = doc.select('#totalChapter, .total-chapter, .story-info .chapters').first();
-        if (totalChapEl) chapterCount = parseInt(cleanText(totalChapEl.text()).replace(/\D+/g, ''), 10) || 0;
+        let totalChapEl = doc.select("#totalChapter, .total-chapter, .story-info .chapters").first();
+        if (totalChapEl) {
+            chapterCount = parseInt(cleanText(totalChapEl.text() + "").replace(/\D+/g, ""), 10) || 0;
+        }
     }
     if (chapterCount) {
-        detail += '<p><strong>Số chương:</strong> ' + chapterCount + '</p>';
+        detail += "<p><strong>Số chương:</strong> " + chapterCount + "</p>";
     }
     if (genreTexts.length) {
-        detail += '<p><strong>Thể loại:</strong> ' + genreTexts.join(', ') + '</p>';
+        detail += "<p><strong>Thể loại:</strong> " + genreTexts.join(", ") + "</p>";
     }
 
-    // --- Suggests & Comments ---
-    var suggests = buildSuggests(authorUrl, firstGenreUrl, url);
-    var comments = [];
+    let suggests = buildSuggests(authorUrl, teamUrl, firstGenreUrl);
+    let comments = [];
     if (storyId) {
-        var countEl = doc.select('#loadCommentBtn .count-items, .count-items').first();
-        var commentCountText = countEl ? cleanText(countEl.text()) : '';
-        var commentTitle = 'Bình luận';
-        if (commentCountText) commentTitle += ' (' + commentCountText + ')';
+        let countEl = doc.select("#loadCommentBtn .count-items, .count-items").first();
+        let commentCountText = countEl ? cleanText(countEl.text() + "") : "";
+        let commentTitle = "Bình luận";
+        if (commentCountText) commentTitle += " (" + commentCountText + ")";
         comments.push({
             title: commentTitle,
             input: JSON.stringify({ storyId: storyId, page: 1 }),
-            script: 'comment.js'
+            script: "comment.js"
         });
     }
 
     return Response.success({
         name: name,
-        cover: cover,
         author: author,
+        cover: cover,
         description: description,
         detail: detail,
+        url: url,
+        type: "novel",
+        format: "novel",
         ongoing: ongoing,
+        nsfw: false,
+        locale: "vi",
         genres: genres,
         suggests: suggests,
         comments: comments,

@@ -1,69 +1,63 @@
-load('config.js');
+load("config.js");
 
 function execute(url) {
     url = normalizeUrl(url);
-    var response = fetchPage(url);
-    if (!response.ok) return Response.error('HTTP Error: ' + response.status);
+    let response = fetchPage(url);
+    if (!response.ok) return Response.error("HTTP " + response.status);
 
-    var doc = response.html();
+    let doc = response.html();
     if (!doc) return Response.success([]);
 
-    var chapters = [];
-    var seen = {};
+    let chapters = [];
+    let seen = {};
 
-    var items = doc.select('#listChapters .list-chapters .item .episode-title a, #listChapters .episode-title a, #listChapters a[href*=".html"]');
-    if (!items || items.size() === 0) {
-        items = doc.select('select#chapterSelect option[value], .chapter-select option[value]');
+    let items = doc.select("#listChapters .list-chapters .item .episode-title a, #listChapters .episode-title a, #listChapters a[href*='.html']");
+    let fromListChapters = items && items.size() > 0;
+
+    if (!fromListChapters) {
+        items = doc.select("select#chapterSelect option[value], .chapter-select option[value]");
     }
 
-    items.forEach(function(a) {
-        var href = normalizeUrl(a.attr('href') || buildChapterFromOption(a.attr('value')));
+    items.forEach(function (el) {
+        let rawLink = (el.attr("href") + "") || buildChapterFromOption(el.attr("value") + "");
+        let href = normalizeUrl(rawLink);
         if (!href || seen[href]) return;
         seen[href] = true;
 
-        var title = cleanText(a.text());
+        let title = cleanText(el.text() + "");
         if (!title) title = guessChapterName(href);
 
         chapters.push({
             name: title,
             url: href,
+            description: "",
+            lock: false,
+            pay: false,
             host: BASE_URL
         });
     });
 
-    chapters.sort(function(a, b) {
-        var na = chapterNumber(a);
-        var nb = chapterNumber(b);
-        if (na !== -1 && nb !== -1 && na !== nb) return na - nb;
-        if (na !== -1 && nb === -1) return -1;
-        if (na === -1 && nb !== -1) return 1;
-        return a.name.localeCompare(b.name);
-    });
+    // #listChapters is rendered newest-first; reversing preserves multi-volume order cleanly.
+    if (fromListChapters && chapters.length > 1) {
+        chapters.reverse();
+    }
 
     return Response.success(chapters);
 }
 
 function buildChapterFromOption(raw) {
-    var v = cleanText(raw);
-    if (!v) return '';
-    if (v.indexOf('http://') === 0 || v.indexOf('https://') === 0) return v;
-    if (v.indexOf(',') >= 0) {
-        var parts = v.split(',');
-        if (parts.length >= 2) return '/' + parts[0] + '/' + parts[1] + '.html';
+    let v = cleanText(raw);
+    if (!v) return "";
+    if (v.indexOf("http://") === 0 || v.indexOf("https://") === 0) return v;
+    if (v.indexOf(",") >= 0) {
+        let parts = v.split(",");
+        if (parts.length >= 2) return "/" + parts[0] + "/" + parts[1] + ".html";
     }
     return v;
 }
 
 function guessChapterName(url) {
-    var m = String(url || '').match(/\/([^\/]+)\.html/i);
-    if (!m) return 'Chương';
-    return cleanText(m[1].replace(/[-_]+/g, ' '));
-}
-
-function chapterNumber(item) {
-    var text = (item.name || '') + ' ' + (item.url || '');
-    var m = text.match(/chuong[-\s]*(\d+)/i);
-    if (!m) m = text.match(/\/(\d+)\.html/i);
-    if (!m) return -1;
-    return parseInt(m[1], 10);
+    let m = String(url || "").match(/\/([^\/]+)\.html/i);
+    if (!m) return "Chương";
+    return cleanText(m[1].replace(/[-_]+/g, " "));
 }
