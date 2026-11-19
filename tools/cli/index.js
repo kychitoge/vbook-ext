@@ -1,219 +1,180 @@
 #!/usr/bin/env node
+'use strict';
 
 const path = require('path');
 const { Command } = require('commander');
+const { EXTENSION_TYPES, EXTENSION_LOCALES } = require('./shared/constants');
+const { runCanonicalVbookCli } = require('./commands/vbook-proxy');
 const { handleExtCommand } = require('./commands/ext');
 const { handleBuildCommand } = require('./commands/build');
 const { handleCatalogCommand } = require('./commands/catalog');
 const { handleVerifyCommand } = require('./commands/verify');
-const { 
-    handleDevicePing, 
-    handleDeviceDebug, 
-    handleDeviceInstall, 
-    handleDeviceTestAll 
-} = require('./commands/device');
 const { handleValidateCommand } = require('./commands/validate');
 const { handleAnalyzeCommand } = require('./commands/analyze');
 const { handlePublishCommand } = require('./commands/publish');
 const { handleCheckEnvCommand } = require('./commands/check-env');
 const { handleSyncRefCommand } = require('./commands/sync-ref');
-
+const { handleSyncSkillCommand } = require('./commands/sync-skill');
 
 const WORKSPACE_ROOT = path.resolve(__dirname, '..', '..');
 require('dotenv').config({ path: path.join(WORKSPACE_ROOT, '.env') });
 
 if (!process.env.VBOOK_AUTHOR && process.env.author) {
-    process.env.VBOOK_AUTHOR = process.env.author;
+  process.env.VBOOK_AUTHOR = process.env.author;
 }
 
 const program = new Command();
 
 program
-    .name('vbook')
-    .description('VBook CLI - Tools for extension developers (v3 Modular)')
-    .version('3.0.0');
+  .name('vbook')
+  .description('VBook CLI - Modular tools for extension developers')
+  .version('3.1.0');
 
+// Official REST-API CLI proxy commands (delegates to canonical .agents/skills/.../vbook.js)
 program.command('connect')
-    .description('Connect and probe local VBook REST-API server')
-    .option('--server <url>', 'VBook server URL')
-    .action(() => {
-        const { fork } = require('child_process');
-        fork(path.join(__dirname, 'vbook.js'), process.argv.slice(2), { stdio: 'inherit' });
-    });
+  .description('Connect and probe local VBook REST-API server')
+  .option('--server <url>', 'VBook server URL')
+  .action(() => runCanonicalVbookCli(WORKSPACE_ROOT));
 
 program.command('test')
-    .description('Test an extension script via official REST-API server')
-    .argument('<ext-dir>', 'Extension directory')
-    .argument('<script>', 'Script file name (e.g. detail.js)')
-    .argument('[args...]', 'Arguments passed to execute()')
-    .option('--server <url>', 'VBook server URL')
-    .action(() => {
-        const { fork } = require('child_process');
-        fork(path.join(__dirname, 'vbook.js'), process.argv.slice(2), { stdio: 'inherit' });
-    });
+  .description('Test an extension script via official REST-API server')
+  .argument('<ext-dir>', 'Extension directory')
+  .argument('<script>', 'Script file name (for example, detail.js)')
+  .argument('[args...]', 'Arguments passed to execute()')
+  .option('--server <url>', 'VBook server URL')
+  .action(() => runCanonicalVbookCli(WORKSPACE_ROOT));
 
+program.command('install')
+  .description('Install an extension directly into the connected VBook app')
+  .argument('<ext-dir>', 'Extension directory')
+  .option('--server <url>', 'VBook server URL')
+  .option('--no-icon', 'Omit icon.png')
+  .action(() => runCanonicalVbookCli(WORKSPACE_ROOT));
+
+program.command('testall')
+  .description('Batch triage extensions via official REST-API server')
+  .argument('[ext...]', 'Extension directories')
+  .option('--server <url>', 'VBook server URL')
+  .option('--query <kw>', 'Search keyword')
+  .option('--timeout <ms>', 'Per-script timeout in ms')
+  .option('--json <file>', 'Write JSON report file')
+  .action(() => runCanonicalVbookCli(WORKSPACE_ROOT));
+
+// Extension authoring and validation commands
 program.command('ext')
-    .description('Tao moi hoac sua metadata extension')
-    .option('--mode <mode>', 'create|edit', 'create')
-    .option('--from-reference <path>', 'Thu muc tham chieu hoc tap', '.private/code-reference/_unknown/example')
-    .option('--name <name>', 'Extension display name')
-    .option('--folder <folder>', 'Output folder slug')
-    .option('--source <url>', 'Source website URL')
-    .option('--type <type>', 'novel|comic|chinese_novel|translate|tts', 'novel')
-    .option('--locale <locale>', 'vi_VN|zh_CN|en_US', 'vi_VN')
-    .option('--author <author>', 'Metadata author')
-    .option('--description <text>', 'Metadata description')
-    .option('--regexp <regex>', 'Metadata regexp')
-    .option('--plugin <path>', 'Extension folder or plugin.json')
-    .option('--version <n>', 'Set metadata.version')
-    .option('--bump-version', 'Increase metadata.version by 1')
-    .option('--dry-run', 'Preview only')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-        const success = await handleExtCommand(options, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
-
-program.command('build')
-    .description('Build extension to plugin.zip')
-    .option('--plugin <path>', 'Extension folder or plugin.json path', 'extensions/novel/kychi_ntruyen')
-    .option('--verify', 'Check if existing plugin.zip is up-to-date with src/')
-    .option('--dry-run', 'Preview only')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-        const success = await handleBuildCommand(options, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
-
-program.command('verify')
-    .description('Full project consistency check (catalog sync + ZIP integrity)')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-        const success = await handleVerifyCommand(options, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
-
-program.command('build-catalog')
-    .description('Rebuild extension catalog from extensions/ directory')
-    .option('--json', 'Output as JSON')
-    .action((options) => {
-        const success = handleCatalogCommand(options, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
+  .description('Create a new extension or edit existing metadata')
+  .option('--mode <mode>', 'create|edit', 'create')
+  .option('--from-reference <path>', 'Custom template or reference directory')
+  .option('--name <name>', 'Extension display name')
+  .option('--folder <folder>', 'Output folder slug')
+  .option('--source <url>', 'Source website URL')
+  .option('--type <type>', EXTENSION_TYPES.join('|'), 'novel')
+  .option('--locale <locale>', EXTENSION_LOCALES.join('|'), 'vi_VN')
+  .option('--author <author>', 'Metadata author')
+  .option('--description <text>', 'Metadata description')
+  .option('--regexp <regex>', 'Metadata regexp')
+  .option('--plugin <path>', 'Extension folder or plugin.json')
+  .option('--version <n>', 'Set metadata.version')
+  .option('--bump-version', 'Increment metadata.version by 1')
+  .option('--dry-run', 'Preview changes without writing files')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const success = await handleExtCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
 
 program.command('validate')
-    .description('Check extension for Rhino compatibility and required patterns')
-    .option('--plugin <path>', 'Extension folder or plugin.json path')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-        const success = await handleValidateCommand(options, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
+  .description('Validate extension manifest and Rhino ES6 compatibility via AST')
+  .option('--plugin <path>', 'Extension folder or plugin.json path')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const success = await handleValidateCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
 
 program.command('analyze')
-    .description('Analyze a URL to suggest selectors and code snippets')
-    .argument('[url]', 'Target website URL')
-    .option('--json', 'Output as JSON')
-    .action(async (url, options) => {
-        const success = await handleAnalyzeCommand({ ...options, url }, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
-
-program.command('publish')
-    .description('Prepare and verify project for publication')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-        const success = await handlePublishCommand(options, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
-
-program.command('check-env')
-    .description('Verify the development environment (.env configuration)')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-        const success = await handleCheckEnvCommand(options, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
-
-program.command('sync-ref')
-    .description('Sync community repos and merge extensions into .private/code-reference')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-        const success = await handleSyncRefCommand(options, WORKSPACE_ROOT);
-        if (!success) process.exitCode = 1;
-    });
-
-
-program.command('device')
-    .description('Debug/install extension on VBook device (TCP bridge)')
-    .option('-i, --ip <ip>', 'Device IP address')
-    .option('-p, --port <port>', 'Device port', '8080')
-    .option('--timeout-ms <n>', 'TCP timeout', '60000')
-    .option('--verbose', 'Verbose network logs')
-    .addCommand(
-        new Command('ping')
-            .description('Check TCP connectivity to device')
-            .action(async (...args) => {
-                const command = args[args.length - 1];
-                const success = await handleDevicePing(command.parent.opts());
-                if (!success) process.exitCode = 1;
-            })
-    )
-    .addCommand(
-        new Command('debug')
-            .description('Debug a script on the device')
-            .argument('<file>', 'Path to the script')
-            .option('-in, --input <input>', 'Input args string')
-            .action(async (file, subOptions, ...rest) => {
-                const command = rest[rest.length - 1];
-                const success = await handleDeviceDebug(file, subOptions, command.parent);
-                if (!success) process.exitCode = 1;
-            })
-    )
-    .addCommand(
-        new Command('install')
-            .description('Install the extension on the device')
-            .option('--plugin <path>', 'Extension folder path')
-            .action(async (subOptions, ...rest) => {
-                const command = rest[rest.length - 1];
-                const success = await handleDeviceInstall(subOptions, command.parent);
-                if (!success) process.exitCode = 1;
-            })
-    )
-    .addCommand(
-        new Command('test-all')
-            .description('One-click test (home -> gen -> detail -> toc -> chap)')
-            .option('--plugin <path>', 'Extension folder path')
-            .option('--no-connect', 'Run offline simulation without connecting to device')
-            .option('--local', 'Run offline simulation without connecting to device')
-            .action(async (subOptions, ...rest) => {
-                const command = rest[rest.length - 1];
-                if (subOptions.connect === false || subOptions.local) {
-                    const { runLocalTestAll } = require('./local-runner');
-                    try {
-                        await runLocalTestAll(subOptions.plugin || '.');
-                    } catch (err) {
-                        console.error('\n[ERROR]', err.message);
-                        process.exitCode = 1;
-                    }
-                    return;
-                }
-                const success = await handleDeviceTestAll(subOptions, command.parent);
-                if (!success) process.exitCode = 1;
-            })
-    );
+  .description('Analyze a webpage URL and suggest starter detail.js selectors')
+  .argument('[url]', 'Target webpage URL')
+  .option('--json', 'Output as JSON')
+  .action(async (url, options) => {
+    const success = await handleAnalyzeCommand({ ...options, url }, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
 
 program.command('test-local')
-    .description('One-click test an extension locally without connecting to device')
-    .argument('[plugin-path]', 'Extension folder path', '.')
-    .action(async (pluginPath) => {
-        const { runLocalTestAll } = require('./local-runner');
-        try {
-            await runLocalTestAll(pluginPath);
-        } catch (err) {
-            console.error('\n[ERROR]', err.message);
-            process.exitCode = 1;
-        }
-    });
+  .description('Run an offline local simulation test for an extension')
+  .argument('<plugin-path>', 'Extension folder path')
+  .action(async (pluginPath) => {
+    const { runLocalTestAll } = require('./runtime/local-test-runner');
+    try {
+      await runLocalTestAll(pluginPath);
+    } catch (err) {
+      console.error('\nError:', err.message);
+      process.exitCode = 1;
+    }
+  });
+
+// Build, catalog, sync, and project maintenance commands
+program.command('build')
+  .description('Package an extension folder into plugin.zip')
+  .option('--plugin <path>', 'Extension folder or plugin.json path')
+  .option('--verify', 'Check whether plugin.zip is up to date with src/')
+  .option('--dry-run', 'Preview without writing plugin.zip')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const success = await handleBuildCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
+
+program.command('build-catalog')
+  .description('Rebuild root plugin.json catalog and README extension table')
+  .option('--json', 'Output as JSON')
+  .action((options) => {
+    const success = handleCatalogCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
+
+program.command('verify')
+  .description('Verify catalog synchronization and plugin.zip integrity')
+  .option('--json', 'Output as JSON')
+  .action((options) => {
+    const success = handleVerifyCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
+
+program.command('publish')
+  .description('Run project readiness checks before publishing')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const success = await handlePublishCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
+
+program.command('check-env')
+  .description('Verify local .env configuration without exposing secret values')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const success = await handleCheckEnvCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
+
+program.command('sync-skill')
+  .description('Sync canonical vbook-extensions skill, templates, and API docs from upstream')
+  .option('--branch <ref>', 'Upstream branch or commit SHA', 'master')
+  .option('--dry-run', 'Preview files that would be updated')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const success = await handleSyncSkillCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
+
+program.command('sync-ref')
+  .description('Sync community reference repositories into .private/code-reference')
+  .option('--manifest <path>', 'Path to remote-sources.json manifest')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const success = await handleSyncRefCommand(options, WORKSPACE_ROOT);
+    if (!success) process.exitCode = 1;
+  });
 
 program.parse(process.argv);

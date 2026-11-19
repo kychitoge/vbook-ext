@@ -1,195 +1,150 @@
-# 🔐 Các mô hình Giải mã Nội dung Website (Decryption Patterns)
+# Các mô hình giải mã nội dung trang nguồn
 
-Tài liệu tri thức này tổng hợp các mô hình bảo mật dữ liệu phổ biến trên các website truyện/comic/video đích và hướng dẫn xây dựng kiến trúc giải mã tối ưu trong VBook Extension.
+Tài liệu này tổng hợp các kỹ thuật giải mã và trích xuất dữ liệu khi **trang web nguồn** (website truyện, truyện tranh, phim) áp dụng các lớp bảo vệ chống cào dữ liệu như mã hóa XOR, AES phía client, hoặc làm lệch bảng mã phông chữ (Font Obfuscation).
 
----
-
-## ⚠️ Phân biệt Quan trọng
 > [!WARNING]
-> Tài liệu này nói về việc **Giải mã dữ liệu của website đích** (để lấy nội dung truyện/ảnh/phim).
-> Để tìm hiểu cách **Mã hóa bảo vệ code JavaScript của Extension**, vui lòng xem: [SOURCE_OBFUSCATION_GUIDE.md](./SOURCE_OBFUSCATION_GUIDE.md).
+> Tài liệu này chỉ phục vụ việc **giải mã dữ liệu trả về từ website đích** để hiển thị trong trình đọc. Để tìm hiểu cách làm rối và mã hóa bảo vệ mã nguồn JavaScript của chính extension trước khi phát hành, xem [Hướng dẫn bảo vệ mã nguồn và giải mã gói extension](./SOURCE_OBFUSCATION_GUIDE.md).
 
 ---
 
-## 🗂️ 1. Bốn Mô hình Mã hóa Kinh điển trên các Website nguồn
+## Bảng phân loại và lựa chọn phương pháp trích xuất
 
-Trong quá trình xây dựng extension, chúng ta thường gặp 4 kiểu cấu trúc dữ liệu sau:
+Khi khảo sát một trang nguồn mới bằng DevTools, hãy xác định mô hình bảo vệ của trang theo bảng dưới đây để chọn giải pháp có chi phí bảo trì thấp nhất:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  MÔ HÌNH BẢO MẬT DỮ LIỆU TRÊN CÁC WEBSITE NGUỒN            │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  1️⃣  MÃ HÓA XOR (Ví dụ: quykhu)                              │
-│     ├─ Kiểu: Văn bản XOR + Mã hóa Base64                     │
-│     ├─ Luồng: HTML → Tìm Key → Gọi API → Giải mã XOR        │
-│     └─ Kỹ thuật: Base64 → Latin1 (Binary) → XOR → UTF8      │
-│                                                             │
-│  2️⃣  API TRỰC TIẾP (Ví dụ: Tomato Novel)                    │
-│     ├─ Kiểu: Không mã hóa, sử dụng Token xác thực           │
-│     ├─ Luồng: Gọi POST/GET kèm Token → Trả về JSON sạch      │
-│     └─ Kỹ thuật: Tốt nhất - bảo trì dễ dàng, cực nhanh      │
-│                                                             │
-│  3️⃣  AES-256 CLIENT-SIDE (Ví dụ: MangaGo)                   │
-│     ├─ Kiểu: Mã hóa AES-256-CBC có IV & ZeroPadding         │
-│     ├─ Luồng: Dữ liệu ảnh ở dạng Base64 mã hóa trong HTML   │
-│     └─ Vấn đề: Key không nằm trong HTML mà sinh động        │
-│                                                             │
-│  4️⃣  MÃ HÓA PHÔNG CHỮ (Ví dụ: Tomato Novel)                   │
-│     ├─ Kiểu: Font Obfuscation (Ánh xạ Unicode lệch)          │
-│     ├─ Luồng: Gọi API → Nhận nội dung chứa ký tự đặc biệt     │
-│     └─ Kỹ thuật: Mảng charset dịch chuyển Unicode bias       │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🔍 2. Phân tích Chi tiết & Giải pháp Kỹ thuật
-
-### 1️⃣ Mô hình XOR (XOR Cipher)
-* **Cách thức bảo vệ**: Dữ liệu chương truyện chữ được mã hóa bằng thuật toán XOR tuần hoàn với một từ khóa (key) động, sau đó mã hóa Base64 trước khi trả về qua API.
-* **Giải pháp bóc tách**:
-  1. Trích xuất Regex tìm từ khóa: `var xorKey = html.match(/key\s*=\s*"([^"]+)"/)`.
-  2. Tải payload Base64 từ API.
-  3. Sử dụng thư viện `crypto.js` để parse Base64 về Latin1, chạy vòng lặp XOR từng ký tự với key tuần hoàn để lấy lại chuỗi UTF-8.
-* **Đoạn code giải mã mẫu**:
-  ```javascript
-  load('crypto.js');
-  
-  function decryptXOR(base64Data, key) {
-      var wa = CryptoJS.enc.Base64.parse(base64Data);
-      var raw = CryptoJS.enc.Latin1.stringify(wa);
-      var result = [];
-      var keyLen = key.length;
-      for (var i = 0; i < raw.length; i++) {
-          result.push(String.fromCharCode(raw.charCodeAt(i) ^ key.charCodeAt(i % keyLen)));
-      }
-      return CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Latin1.parse(result.join('')));
-  }
-  ```
-
-### 2️⃣ Mô hình API Trực tiếp (Direct API)
-* **Cách thức bảo vệ**: Không mã hóa nội dung. Dữ liệu được tải qua API dưới dạng JSON sạch nhưng yêu cầu Header hoặc Cookie xác thực (Token).
-* **Giải pháp bóc tách**:
-  - Không cần reverse-engineer thuật toán mã hóa.
-  - Sử dụng Jsoup hoặc HTTP Client gọi trực tiếp API với các tham số cần thiết.
-* **Đánh giá**: Đây là **Giải pháp tối ưu nhất** vì mã nguồn đơn giản, thực thi cực nhanh và dễ bảo trì lâu dài.
-
-### 3️⃣ Mô hình AES-256 Client-Side
-* **Cách thức bảo vệ**: Dữ liệu (ví dụ danh sách link ảnh comic) được mã hóa AES-256-CBC ngay trên server và nhúng vào HTML dưới dạng biến Base64 (ví dụ: `var imgsrcs = "bG4U2Jat..."`). Khóa AES (Key) không được hiển thị trực tiếp trong mã nguồn HTML mà được sinh động ở runtime hoặc nằm trong bundle JS đã bị nén.
-* **Giải pháp bóc tách (Bí quyết thực tế)**:
-  - Việc mò key giải mã thủ công cực kỳ tốn thời gian và dễ bị hỏng khi website thay đổi thuật toán.
-  - **GIẢI PHÁP TỐI ƯU**: Sử dụng **Headless Browser (`Engine.newBrowser`)**. Do trình duyệt sẽ tự động thực thi các file JavaScript của website, trang web sẽ tự giải mã dữ liệu để hiển thị lên màn hình. Chúng ta chỉ cần khởi động trình duyệt ngầm, đợi trang web giải mã xong, và trích xuất các thẻ `<img>` đã được giải mã hoàn chỉnh từ DOM.
-
-### 4️⃣ Mô hình Mã hóa Phông chữ (Font Obfuscation & Custom Charset Mapping)
-* **Cách thức bảo vệ**: Để ngăn chặn việc cào dữ liệu văn bản tự động, một số website đọc truyện lớn (như fanqienovel.com) sử dụng phông chữ tùy biến (Custom Font) kết hợp ánh xạ lệch mã hóa Unicode. Khi cào HTML thô hoặc gọi API trực tiếp, văn bản nhận về sẽ là các ký tự lạ hoặc các ô vuông trống nằm trong dãy Unicode Private Use Area (ví dụ: `\uE3E8` đến `\uE55B`). Nhưng trên trình duyệt của người dùng, nhờ file font `.woff` hoặc `.ttf` đặc thù được tải về, các mã lệch này vẫn hiển thị đúng các chữ thường dùng.
-* **Giải pháp bóc tách (Bí quyết thực tế)**:
-  - Khảo sát và giải mã phông chữ tùy biến, lập bảng đối chiếu (Custom Charset Array) tương ứng với độ lệch ký tự (Bias).
-  - Viết hàm ánh xạ ngược bằng cách lấy mã CharCode của ký tự lạ, trừ đi mã Unicode khởi điểm để làm chỉ mục (Index) tra cứu từ bảng Charset nhằm lấy lại ký tự gốc đúng nghĩa.
-* **Đoạn code giải mã mẫu**:
-  ```javascript
-  function decodeFontObfuscation(obfuscatedText) {
-      if (!obfuscatedText) return "";
-      var str = String(obfuscatedText);
-      var CODE_START = 58344; // Mã Unicode hex 0xE3E8 đại diện cho kí tự lệch đầu tiên
-      var CODE_END = 58715;   // Mã kết thúc
-      
-      // Bảng charset ánh xạ đối chiếu tương ứng với các bias lệch
-      var charset = ["体","y","十","现","快","便","话","却","月","物","水","的","放","知","..."]; 
-      
-      var result = "";
-      for (var i = 0; i < str.length; i++) {
-          var cc = str.charCodeAt(i);
-          if (cc >= CODE_START && cc <= CODE_END) {
-              var bias = cc - CODE_START;
-              if (bias >= 0 && bias < charset.length && charset[bias]) {
-                  result += charset[bias];
-              } else { result += str.charAt(i); }
-          } else { result += str.charAt(i); }
-      }
-      return result;
-  }
-  ```
-
----
-
-## 📊 3. Bảng so sánh các phương pháp bóc tách
-
-| Tiêu chí | XOR Cipher | Direct API | AES Client-Side | Font Obfuscation |
+| Mô hình bảo vệ của trang nguồn | Dấu hiệu nhận biết | Giải pháp ưu tiên trong vBook | Tốc độ | Độ ổn định |
 | :--- | :--- | :--- | :--- | :--- |
-| **Độ phức tạp** | Trung bình | Thấp | Cao | Trung bình |
-| **Sự phụ thuộc Key** | Cần tìm Key trong HTML | Không cần Key | Key sinh động / ẩn | Cần mảng Charset tĩnh |
-| **Phương pháp giải** | Code thuật toán XOR thủ công | Gọi API trực tiếp kèm Token | Sử dụng `Engine.newBrowser()` | Tra cứu mảng dịch chuyển mã |
-| **Độ ổn định** | Trung bình (Site đổi key) | Rất cao | Rất cao (Bằng Browser Engine) | Rất cao (Hiếm khi đổi charset) |
-| **Tốc độ thực thi** | Nhanh | Cực nhanh | Trung bình (Tốn thời gian render) | Nhanh |
+| **1. Direct API (JSON/HTML)** | Tab Network có request XHR/Fetch trả về JSON hoặc HTML rõ nghĩa, chỉ yêu cầu Header, Cookie hoặc Token | Gọi trực tiếp `fetch(apiUrl, { headers })` | Rất nhanh | Rất cao |
+| **2. XOR + Base64 Payload** | API trả về chuỗi Base64 vô nghĩa; mã nguồn trang có hàm giải mã XOR với một khóa ngắn | Nạp `load("crypto.js")` và giải mã Base64 sang Latin1 rồi XOR theo khóa | Nhanh | Trung bình |
+| **3. AES-CBC / AES-GCM tĩnh** | Dữ liệu bị mã hóa AES với khóa/IV có thể trích xuất cố định hoặc tính qua MD5/SHA256 | Dùng cầu nối gốc `load("crypto.js")` (`CryptoJS.AES.decrypt` hoặc `decryptGcm`) | Nhanh | Cao |
+| **4. AES / JS Bundle động** | Khóa giải mã sinh động trong bundle JS bị làm rối nặng hoặc phụ thuộc WebAssembly/Canvas | Khởi chạy `Engine.newBrowser()`, đợi trang tự giải mã rồi lấy DOM đã render | Trung bình | Rất cao |
+| **5. Làm lệch phông chữ (Font Obfuscation)** | Văn bản trả về chứa các ký tự nằm trong vùng Unicode Private Use Area (`\uE000`–`\uF8FF`), trang tải kèm tệp `.woff`/`.ttf` riêng | Lập bảng mảng ký tự đối chiếu theo độ lệch (`charCode - CODE_START`) | Nhanh | Rất cao |
 
 ---
 
-## 🏛️ 4. Kiến trúc Extension tối ưu tự động (Recommended Template)
+## Triển khai chi tiết từng mô hình
 
-Mẫu cấu trúc file `chap.js` thông minh, tự động chọn giải pháp bóc tách dữ liệu theo thứ tự ưu tiên tối ưu nhất:
+### 1. Mô hình XOR + Base64 với `crypto.js`
+
+Nhiều trang truyện chữ mã hóa nội dung chương bằng phép toán XOR tuần hoàn theo một khóa chuỗi, sau đó mã hóa Base64 trước khi truyền qua JSON.
 
 ```javascript
-load('config.js');
+load("config.js");
+load("crypto.js");
+
+function decryptXorBase64(base64Payload, key) {
+    let wordArray = CryptoJS.enc.Base64.parse(base64Payload);
+    let rawLatin1 = CryptoJS.enc.Latin1.stringify(wordArray);
+    let out = [];
+    let keyLen = key.length;
+
+    for (let i = 0; i < rawLatin1.length; i++) {
+        let code = rawLatin1.charCodeAt(i) ^ key.charCodeAt(i % keyLen);
+        out.push(String.fromCharCode(code));
+    }
+
+    return CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Latin1.parse(out.join("")));
+}
+```
+
+### 2. Mô hình AES-CBC và AES-GCM qua cầu nối gốc `crypto.js`
+
+Khi nạp `load("crypto.js")`, ứng dụng cung cấp cầu nối Kotlin/Java thực thi các thuật toán băm (`MD5`, `SHA1`, `SHA256`, `SHA512`, `Hmac*`) và `AES` (`CBC`, `ECB`, `CFB`, `OFB`, `CTR`, cùng hai hàm mở rộng `encryptGcm` / `decryptGcm`) với tốc độ gốc trên thiết bị.
+
+```javascript
+load("config.js");
+load("crypto.js");
+
+function decryptAesCbc(cipherBase64, keyUtf8, ivUtf8) {
+    let key = CryptoJS.enc.Utf8.parse(keyUtf8);
+    let iv = CryptoJS.enc.Utf8.parse(ivUtf8);
+    let decrypted = CryptoJS.AES.decrypt(cipherBase64, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+    });
+    return decrypted.toString(CryptoJS.enc.Utf8) + "";
+}
+
+function decryptAesGcmPayload(cipherBase64, keyUtf8, ivUtf8) {
+    let key = CryptoJS.enc.Utf8.parse(keyUtf8);
+    let iv = CryptoJS.enc.Utf8.parse(ivUtf8);
+    let decrypted = CryptoJS.AES.decryptGcm(cipherBase64, key, iv);
+    return decrypted.toString(CryptoJS.enc.Utf8) + "";
+}
+```
+
+> [!NOTE]
+> Cầu nối gốc `crypto.js` không bao gồm các thuật toán cũ như `DES`, `TripleDES`, `RC4`, `Rabbit`, `PBKDF2` hoặc `EvpKDF`. Nếu trang nguồn dùng khóa dẫn xuất `EvpKDF` (OpenSSL `Salted__`), bạn có thể tự tính khóa + IV bằng vòng lặp `CryptoJS.MD5` trên mảng byte rồi truyền trực tiếp `key` và `iv` vào `CryptoJS.AES.decrypt`.
+
+### 3. Mô hình ủy quyền giải mã cho trình duyệt ngầm (`Engine.newBrowser()`)
+
+Khi website nhúng khóa AES động vào các bundle JavaScript bị làm rối phức tạp, việc dịch ngược thủ công rất tốn công và dễ hỏng mỗi khi trang web build lại bundle. Giải pháp bền vững nhất là để chính trình duyệt ngầm của vBook chạy mã JavaScript của trang web và trích xuất kết quả từ DOM sau khi trang đã tự giải mã.
+
+```javascript
+load("config.js");
 
 function execute(url) {
-    // ƯU TIÊN 1: Thử sử dụng Trình duyệt ngầm để lấy dữ liệu đã tự giải mã trong DOM (Dành cho JS-heavy / AES)
-    var doc = tryBrowserEngine(url, 15000, 'img[src*="decrypted-cdn"]');
-    if (doc) {
-        return extractFromDOM(doc);
-    }
-    
-    // ƯU TIÊN 2: Thử gọi API trực tiếp nếu phát hiện endpoint hoạt động
-    var apiResponse = tryDirectAPI(url);
-    if (apiResponse && apiResponse.ok) {
-        return Response.success(apiResponse.data);
-    }
-    
-    // ƯU TIÊN 3: Giải mã thủ công (XOR) nếu tìm thấy biến mã hóa và Key
-    var html = fetch(url).text();
-    var encryptedData = extractVariable(html, 'imgsrcs');
-    var key = extractVariable(html, 'xor_key');
-    if (encryptedData && key) {
-        load('crypto.js');
-        var decrypted = decryptXOR(encryptedData, key);
-        return Response.success(decrypted);
-    }
-    
-    return Response.error("Tất cả các phương thức trích xuất dữ liệu đều thất bại");
-}
+    url = normalizeUrl(url);
+    let browser = Engine.newBrowser();
+    try {
+        browser.setUserAgent(UserAgent.android());
+        browser.block(["googlesyndication.com", "doubleclick.net"]);
+        browser.launch(url, 15000);
+        browser.waitUrl(".*cdn.*", 8000);
 
-function tryBrowserEngine(url, timeout, selector) {
-    if (Engine && Engine.newBrowser) {
-        var browser = Engine.newBrowser();
-        try {
-            var page = browser.launch(url, timeout);
-            var hasElements = page.select(selector).length > 0;
-            if (hasElements) {
-                return page; // Trả về trang đã render để trích xuất dữ liệu
-            }
-        } catch(e) {
-            Log.log("Lỗi render trình duyệt ngầm: " + e.message);
-        } finally {
-            // Không đóng trình duyệt ở đây nếu cần trả về DOM, nhưng phải đóng sau khi dùng xong
-            if (browser && browser.close) browser.close();
+        let doc = browser.html();
+        let items = doc.select("img.chapter-img");
+        if (items.isEmpty()) {
+            return Response.error("Không tìm thấy ảnh chương sau khi trình duyệt tải trang.");
+        }
+
+        let images = items.map(function (el) {
+            return (el.attr("data-src") || el.attr("src")) + "";
+        });
+        return Response.success(images);
+    } finally {
+        browser.close();
+    }
+}
+```
+
+### 4. Mô hình ánh xạ bảng mã phông chữ tùy biến (Font Obfuscation)
+
+Một số nền tảng tiểu thuyết lớn (như Fanqie / Cà Chua) thay thế các chữ Hán phổ biến bằng các mã ký tự trong vùng Unicode Private Use Area (ví dụ từ `0xE3E8` đến `0xE55B`) và dùng phông chữ `.woff` riêng để hiển thị.
+
+Để khôi phục văn bản gốc cho trình đọc và bộ máy dịch Việt Phrase / TTS:
+
+1. Tải tệp phông chữ của trang nguồn, trích xuất thứ tự glyph sang mảng đối chiếu tĩnh `CHARSET`.
+2. Trừ mã Unicode của từng ký tự (`str.charCodeAt(i)`) cho mã bắt đầu `CODE_START` để lấy chỉ mục tra cứu trong mảng `CHARSET`:
+
+```javascript
+let CODE_START = 58344; // 0xE3E8
+let CODE_END = 58715;   // 0xE55B
+let CHARSET = ["体", "y", "十", "现", "快", "便", "话", "却", "月", "物", "水", "的", "放", "知"];
+
+function decodeCustomFont(text) {
+    if (!text) return "";
+    let str = String(text);
+    let out = [];
+
+    for (let i = 0; i < str.length; i++) {
+        let code = str.charCodeAt(i);
+        if (code >= CODE_START && code <= CODE_END) {
+            let mapped = CHARSET[code - CODE_START];
+            out.push(mapped ? mapped : str.charAt(i));
+        } else {
+            out.push(str.charAt(i));
         }
     }
-    return null;
-}
-
-function extractFromDOM(doc) {
-    var images = [];
-    doc.select('img[src*="decrypted-cdn"]').forEach(function(el) {
-        images.push(normalizeUrl(el.attr("src")));
-    });
-    return Response.success(images);
+    return out.join("");
 }
 ```
 
 ---
 
-## 💡 Triết lý cốt lõi của VBook Tool
-> **"Hãy để Trình duyệt thực hiện công việc nặng nhọc, chúng ta chỉ lấy kết quả"**
-> 
-> Đây là lý do `Engine.newBrowser()` được sinh ra. Hãy tận dụng nó làm vũ khí tối thượng đối với các nguồn truyện/phim áp dụng các kỹ thuật mã hóa phức tạp.
+## Chiến lược kết hợp nhiều tầng (Fallback Pattern)
+
+Đối với các trang nguồn thường xuyên bật/tắt lớp bảo vệ theo tải máy chủ, thiết kế hàm `execute(url)` theo thứ tự ưu tiên từ nhẹ đến nặng:
+
+1. **Tầng 1 (Nhanh nhất)**: Gọi `fetch()` trực tiếp vào endpoint API hoặc trang HTML tĩnh và giải mã bằng `crypto.js` nếu có khóa rõ ràng.
+2. **Tầng 2 (Dự phòng tự động)**: Khi `response.ok` thất bại (ví dụ gặp HTTP 403/503) hoặc DOM tĩnh không chứa dữ liệu chương, chuyển sang khởi chạy `Engine.newBrowser()` trong khối `try / finally` để lấy nội dung sau khi WebView hoàn tất giải mã.

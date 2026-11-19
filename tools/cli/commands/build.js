@@ -1,6 +1,21 @@
 const { buildExtensionZip, checkExtensionZipIntegrity } = require('../build/build');
+const { printJson, formatError } = require('../shared/output');
 
 async function handleBuildCommand(options, workspaceRoot) {
+    if (!options.plugin) {
+        const message = formatError(
+            'Missing required option --plugin <path>.',
+            'No target extension folder was specified.',
+            'Run `npm run build:ext -- --plugin extensions/<type>/<slug>`.'
+        );
+        if (options.json) {
+            printJson({ success: false, error: message });
+        } else {
+            console.error(`Error: ${message}`);
+        }
+        return false;
+    }
+
     if (options.verify) {
         const check = checkExtensionZipIntegrity(workspaceRoot, options.plugin);
         if (options.json) {

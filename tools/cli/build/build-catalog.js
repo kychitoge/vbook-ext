@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { EXTENSION_TYPES } = require('../shared/constants');
 
 const DEFAULT_RAW_BASE = 'https://raw.githubusercontent.com/kychitoge/vbook-ext/main';
-const EXTENSION_TYPES = ['novel', 'comic', 'video', 'audio', 'chinese_novel', 'translate', 'tts', 'ai'];
 
 function safeReadJson(filePath) {
     try {

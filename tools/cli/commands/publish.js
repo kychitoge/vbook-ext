@@ -1,27 +1,38 @@
+'use strict';
+
 const { handleVerifyCommand } = require('./verify');
+const { printHeading, printStatus, printJson } = require('../shared/output');
 
 async function handlePublishCommand(options, workspaceRoot) {
-    console.log('\nVBook Extension Publish Prep');
-    console.log('===========================');
+  if (!options.json) {
+    printHeading('VBook publish readiness check');
+  }
 
-    // 1. Run full verification first
-    console.log('Running project verification...');
-    const verified = await handleVerifyCommand(options, workspaceRoot);
+  const verified = handleVerifyCommand({ ...options, json: false }, workspaceRoot);
 
-    if (!verified) {
-        console.error('\n[ERROR] Project verification failed. Fix all issues before publishing.');
-        return false;
-    }
+  if (options.json) {
+    printJson({
+      success: verified,
+      ready: verified,
+      nextSteps: verified
+        ? ['Review git diff and commit changes.', 'Push to GitHub after user confirmation.']
+        : ['Rebuild outdated plugin.zip files and run `npm run build:catalog`.']
+    });
+    return verified;
+  }
 
-    console.log('\n[CHECK] ZIP integrity: PASSED');
-    console.log('[CHECK] Catalog alignment: PASSED');
-    
-    console.log('\nNext steps for publication:');
-    console.log('1. Commit all changes: git commit -am "chore: release extensions"');
-    console.log('2. Push to GitHub: git push origin main');
-    console.log('3. Vercel will automatically redeploy the dynamic catalog.');
+  if (!verified) {
+    printStatus('error', 'Project verification failed. Fix all reported issues before publishing.');
+    return false;
+  }
 
-    return true;
+  printStatus('ok', 'ZIP integrity and catalog alignment passed.');
+  console.log('\nNext steps:');
+  console.log('  1. Review changes with `git status` and `git diff`.');
+  console.log('  2. Commit and push to GitHub after confirmation.');
+  return true;
 }
 
-module.exports = { handlePublishCommand };
+module.exports = {
+  handlePublishCommand
+};

@@ -1,87 +1,106 @@
-# 🤝 Hướng dẫn Đóng góp (Contributing Guidelines)
+# Hướng dẫn đóng góp và quy chuẩn phát hành
 
-Chào mừng bạn đến với Kho lưu trữ công cụ phát triển extension của VBook. Tài liệu này hướng dẫn các nhà phát triển cách cấu hình môi trường, quy trình đóng góp mã nguồn (Pull Request) và quy chuẩn làm việc thống nhất.
+Tài liệu này quy định cách thiết lập môi trường máy trạm, chính sách đánh số phiên bản, quy tắc bảo mật và cổng kiểm định chất lượng (Pre-commit Quality Gate) trước khi đưa thay đổi lên GitHub.
 
----
-
-## 📂 1. Phạm vi phân vùng thư mục
-
-Dự án này là công cụ kết hợp 2-trong-1: quản lý phát triển extension cho nhà quản trị và cung cấp chỉ mục tham khảo cho cộng đồng.
-
-* **Công khai (Public extensions)**: Nằm trong thư mục `extensions/**` - Chứa các extension công khai cho cộng đồng (Bắt buộc chạy `build:catalog` để hiển thị).
-* **Cá nhân (Private extensions)**: Nằm trong thư mục `.private/extensions/**` - Không công khai, bị bỏ qua bởi git, an toàn để thử nghiệm hoặc dùng cá nhân.
-* **Đóng gói Gitea (Gitea Private extensions)**: Nằm trong thư mục `.tea-ext/**`. Được sử dụng để chứa các extension private được đóng gói để tải lên hệ thống server Gitea riêng của bạn.
-  - `.tea-ext/plugin.json`: Quản lý danh mục các extension trong thư mục này.
-  - `.tea-ext/extensions/`: Chứa mã nguồn của từng extension private tương ứng.
-* **Bộ công cụ (CLI Tools)**: Nằm trong thư mục `tools/cli/**` - Chứa mã nguồn của CLI.
-* **Tài liệu (Docs)**: Nằm trong thư mục `docs/**` và `.agent/`.
+> [!NOTE]
+> Để tra cứu cú pháp đầy đủ của các lệnh dòng lệnh, xem [Tham chiếu lệnh CLI và phân vùng dự án](./CLI_WORKFLOW.md). Để xem quy tắc viết mã nguồn Rhino JavaScript, xem [Hướng dẫn kỹ thuật phát triển extension trên Rhino runtime](./EXTENSION_DEVELOPMENT_GUIDE.md).
 
 ---
 
-## 🛠️ 2. Cài đặt môi trường phát triển (Prerequisites)
+## Thiết lập môi trường phát triển
 
-### Cài đặt dependencies
+### 1. Cài đặt phụ thuộc cho công cụ CLI
+
+Yêu cầu Node.js 18 trở lên. Tại thư mục gốc của dự án, chạy lệnh:
+
 ```bash
 npm install
 ```
 
-### Thiết lập tệp cấu hình môi trường (`.env`)
-Tạo tệp tin `.env` tại thư mục gốc của dự án với nội dung mẫu sau:
+### 2. Cấu hình tệp `.env` (Tùy chọn)
+
+Tạo tệp `.env` tại thư mục gốc để khai báo tên tác giả mặc định khi khởi tạo extension mới và địa chỉ máy chủ thiết bị (nếu không dùng `servers.json`):
+
 ```env
-VBOOK_IP=192.168.1.100       # Địa chỉ IP của thiết bị chạy app vBook để debug
-LOCAL_PORT=3000              # Port chạy local server để test
-VBOOK_AUTHOR=tên_của_bạn     # Tên tác giả hiển thị mặc định trên extension của bạn
+VBOOK_AUTHOR=kychi
+VBOOK_SERVER=http://192.168.1.100:8080
 ```
+
+Kiểm tra trạng thái cấu hình (lệnh này chỉ báo trạng thái `configured` / `missing` / `unset`, không in giá trị bí mật ra màn hình):
+
+```bash
+node tools/cli/index.js check-env
+```
+
+### 3. Cấu hình danh sách máy chủ thiết bị (`servers.json`)
+
+Sao chép tệp mẫu `.agents/skills/vbook-extensions/scripts/servers.example.json` thành `.agents/skills/vbook-extensions/scripts/servers.json` và điền danh sách địa chỉ IP:Port hiển thị khi bật chế độ nhà phát triển trong ứng dụng vBook:
+
+```json
+{
+  "servers": [
+    "http://192.168.1.100:8080",
+    "http://127.0.0.1:8080"
+  ]
+}
+```
+
+> [!IMPORTANT]
+> Tệp `.env` và mọi tệp `servers.json` đều đã được cấu hình trong `.gitignore`. Tuyệt đối không đưa khóa API, mật khẩu, token cá nhân hoặc tệp `servers.json` vào lịch sử commit.
 
 ---
 
-## 🔄 3. Quy trình Đóng góp Extension tiêu chuẩn
+## Quy trình đóng góp một extension từ đầu đến cuối
 
-Để đóng góp một extension mới hoặc cập nhật một extension có sẵn, bạn bắt buộc phải tuân theo 5 bước sau:
+1. **Khởi tạo từ bộ khung mẫu**:
+   ```bash
+   npm run ext:create -- --name <ten-nguon> --source <url-nguon> --type <novel|comic|video|audio|news|forum|tts|translate|ai>
+   ```
+2. **Hiện thực hóa và kiểm thử**:
+   - Viết các script trong `src/*.js` theo đúng [Đặc tả API extension chính thức](./extension-api.md).
+   - Chạy kiểm thử từng script với thiết bị thật qua `npm run vbook:test -- <ext-dir> <script.js> [args...]` và đối chiếu dữ liệu trả về với [Danh mục kiểm tra đầu ra](./verify-checklist.md).
+3. **Kiểm tra tĩnh bằng bộ phân tích AST**:
+   ```bash
+   npm run ext:validate -- --plugin <ext-dir>
+   ```
+4. **Nâng phiên bản, đóng gói ZIP và đồng bộ danh mục**:
+   ```bash
+   # Nâng metadata.version thêm 1 (khi sửa extension đã có sẵn)
+   node tools/cli/index.js ext --mode edit --plugin <ext-dir> --bump-version
 
-### Bước 1: Tạo mới Extension thông qua CLI
-```bash
-npm run ext:create -- --name MyExtension --source https://example.com --type novel
-```
-* > [!WARNING]
-  > **Không tạo thư mục bằng tay**. Sử dụng CLI để sinh khung dữ liệu chuẩn xác nhất từ `templates/{type}`.
+   # Đóng gói plugin.zip
+   npm run vbook:build -- <ext-dir>
+   # hoặc đóng gói cục bộ: npm run build:ext -- --plugin <ext-dir>
 
-### Bước 2: Lập trình Mã nguồn
-* Tham khảo hướng dẫn [docs/extension-api.md](./extension-api.md), [docs/EXTENSION_DEVELOPMENT_GUIDE.md](./EXTENSION_DEVELOPMENT_GUIDE.md) và [.claude/skills/vbook-extensions/SKILL.md](../.claude/skills/vbook-extensions/SKILL.md) để viết mã nguồn đúng chuẩn Rhino ES6 safe subset.
-
-### Bước 3: Kiểm thử Trực tiếp trên App
-```bash
-npm run vbook:test -- extensions/novel/my_ext detail.js https://example.com/item/123
-```
-* Đối chiếu kết quả với [docs/verify-checklist.md](./verify-checklist.md).
-
-### Bước 4: Đóng gói tệp ZIP & Tái tạo danh mục tổng (Bắt buộc)
-```bash
-npm run vbook:build -- extensions/novel/my_ext
-npm run build:catalog
-```
-
----
-
-## 📋 4. Pull Request Checklist (Dành cho Dev & Agent)
-
-Trước khi thực hiện commit mã nguồn hoặc tạo Pull Request, vui lòng kiểm tra kỹ danh sách sau:
-
-- [ ] **Lệnh CLI**: Thư mục extension và metadata được tạo/chỉnh sửa thông qua CLI.
-- [ ] **Không chỉnh sửa catalog bằng tay**: Không chỉnh sửa trực tiếp các file `plugin.json` tổng hợp ở gốc.
-- [ ] **Quy tắc Rhino ES6 Safe**: Chỉ viết Pure JS (không cài thêm hay dùng Node packages trong `src/*.js`), bắt buộc dùng `let` hoặc `var` (không dùng `const`). Không dùng `async/await`, `?.`, `??`, `{...spread}`, `Array.flat`. Không khai báo biến trùng key `plugin.json.config` (như `let DOMAIN = ...`).
-- [ ] **Kiểm tra `response.ok`**: Luôn kiểm tra `if (!response.ok)` trước khi parse DOM/JSON.
-- [ ] **Đóng gói ZIP**: Extension đã được chạy lệnh build ra tệp tin `plugin.zip` thành công.
-- [ ] **Catalog Rebuilt**: Đã chạy lệnh `npm run build:catalog` và có thay đổi trong danh mục tổng.
-- [ ] **Dọn dẹp log**: Không commit các tệp tin log sinh ra từ `tools/cli/reports/` lên git.
-- [ ] **Thông tin nhạy cảm**: Không commit thông tin mật khẩu, token cấu hình Gitea cá nhân lên git.
+   # Cập nhật plugin.json gốc và bảng README.md
+   npm run build:catalog
+   ```
+5. **Xác minh tính toàn vẹn toàn dự án**:
+   ```bash
+   npm run ext:verify
+   ```
 
 ---
 
-## 🆘 5. Khắc phục sự cố thường gặp (Troubleshooting)
+## Cổng kiểm định trước khi commit (Pre-commit Checklist)
 
-| Vấn đề gặp phải | Nguyên nhân phổ biến | Cách xử lý |
+Trước khi tạo commit hoặc mở Pull Request, hãy đảm bảo toàn bộ các mục sau đều đạt:
+
+- [ ] **Tăng phiên bản (`metadata.version`)**: Đã tăng `metadata.version` thêm `1` trong `plugin.json` đối với mọi extension có chỉnh sửa mã nguồn hoặc cấu hình.
+- [ ] **Đạt kiểm tra AST (`npm run ext:validate`)**: Mã nguồn trong `src/*.js` chỉ dùng Pure JS, dùng `let`/`var` (không dùng `const`), không chứa `async`/`await`, `?.`, `??`, và không khai báo lại `DOMAIN`.
+- [ ] **Đạt kiểm tra dữ liệu thật**: Mọi script đã được chạy thử và trả về dữ liệu khớp với [Danh mục kiểm tra đầu ra](./verify-checklist.md), không chỉ kiểm tra mỗi `code: 0`.
+- [ ] **Gói `plugin.zip` mới nhất**: Đã đóng gói lại `plugin.zip` sau lần sửa cuối cùng của `src/` hoặc `plugin.json`.
+- [ ] **Đồng bộ catalog gốc (`npm run build:catalog`)**: Không sửa thủ công `plugin.json` ở thư mục gốc hay bảng danh sách extension trong `README.md`; luôn sinh lại bằng `npm run build:catalog`.
+- [ ] **Dọn dẹp tệp tạm**: Đã xóa toàn bộ script probe tạm thời, tệp báo cáo JSON thử nghiệm và tệp `.log` phát sinh trong quá trình debug.
+- [ ] **Đúng phân vùng bảo mật**: Các extension cá nhân hoặc thử nghiệm nội bộ phải đặt trong `.private/` hoặc `.tea-ext/`, không đưa vào `extensions/`.
+
+---
+
+## Xử lý sự cố thường gặp
+
+| Tình huống | Nguyên nhân | Cách khắc phục |
 | :--- | :--- | :--- |
-| **Lỗi đóng gói ZIP** | Thư mục thiếu file `plugin.json` ở gốc hoặc thiếu thư mục `src/` | Kiểm tra lại cấu trúc folder, đảm bảo có đủ các file yêu cầu |
-| **Không tìm thấy extension mới** | Chưa chạy build catalog hoặc extension nằm trong folder private | Chạy lệnh `npm run build:catalog` và kiểm tra extension có nằm đúng thư mục `extensions/` hay không |
-| **Lỗi giải mã sau khi mã hóa** | Tác giả hoặc Nguồn (Source) trong `plugin.json` bị lệch ký tự | Đảm bảo trường `source` và `author` khớp chính xác 100% với cấu hình lúc chạy lệnh mã hóa |
+| `ext:verify` báo `[OUTDATED_ZIP]` | Tệp trong `src/` hoặc `plugin.json` được sửa sau thời điểm tạo `plugin.zip` | Chạy `npm run build:ext -- --plugin <ext-dir>` hoặc `npm run vbook:build -- <ext-dir>` |
+| `ext:verify` báo `[NOT_IN_ROOT]` | Extension mới chưa được cập nhật vào `plugin.json` gốc | Chạy `npm run build:catalog` |
+| `vbook:connect` báo không kết nối được máy chủ | Ứng dụng vBook chưa bật chế độ debug/dev hoặc sai IP trong `servers.json` | Bật chế độ nhà phát triển trong ứng dụng vBook, cập nhật IP:Port vào `.agents/skills/vbook-extensions/scripts/servers.json` hoặc truyền `--server http://<ip>:<port>` |
+| Lỗi giải mã sau khi chạy mã hóa AES | `metadata.source` hoặc `metadata.author` bị sửa sau khi sinh `*.encrypted.js` | Khôi phục mã nguồn `.js` gốc và chạy lại `npm run encrypt:pipeline -- <ext-dir>` |

@@ -34,9 +34,12 @@ async function handleExtCommand(options, workspaceRoot) {
         console.log('VBook Extension Tool');
         console.log('====================');
         console.log(`Mode: ${mode}`);
-        console.log(`Reference: ${options.fromReference}`);
+        if (options.fromReference) {
+            console.log(`Reference: ${options.fromReference}`);
+        }
         if (mode === 'create') {
             console.log(`Name: ${result.name}`);
+            console.log(`Template: ${result.templateDir}`);
             console.log(`Output: ${result.outputDir}`);
             console.log(`Generated: ${result.generated ? 'yes' : 'no (dry-run)'}`);
         } else {

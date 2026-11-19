@@ -81,18 +81,22 @@ Khám phá thêm các extension khác được chia sẻ bởi cộng đồng vB
 
 Bộ công cụ chính thức từ Admin vBook & Repo Tooling:
 
+* **Hướng dẫn cho AI Agent**: [AGENTS.md](./AGENTS.md) & [.agents/skills/vbook-extensions/SKILL.md](./.agents/skills/vbook-extensions/SKILL.md)
 * **Tài liệu API chuẩn**: [docs/extension-api.md](./docs/extension-api.md)
-* **Checklist kiểm tra**: [docs/verify-checklist.md](./docs/verify-checklist.md)
-* **Master Skill Spec**: [.claude/skills/vbook-extensions/SKILL.md](.claude/skills/vbook-extensions/SKILL.md)
+* **Checklist kiểm tra đầu ra**: [docs/verify-checklist.md](./docs/verify-checklist.md)
+* **Tham chiếu lệnh CLI & Phân vùng**: [docs/CLI_WORKFLOW.md](./docs/CLI_WORKFLOW.md)
+* **Hướng dẫn kỹ thuật Rhino Runtime**: [docs/EXTENSION_DEVELOPMENT_GUIDE.md](./docs/EXTENSION_DEVELOPMENT_GUIDE.md)
+* **Quy chuẩn đóng góp & Phát hành**: [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)
 
 #### Lệnh CLI chính:
 ```bash
-# Khởi tạo extension mới từ template chuẩn admin
+# Khởi tạo extension mới từ template chuẩn admin (--type: novel|comic|video|audio|news|forum|tts|translate|ai)
 npm run ext:create -- --name "Tên Extension" --source "https://domain.com" --type novel
 
+# Kiểm tra hợp đồng manifest và cú pháp Rhino ES6 bằng AST
+npm run ext:validate -- --plugin <ext-folder>
+
 # Test script trực tiếp với VBook app REST-API server
-node .claude/skills/vbook-extensions/scripts/vbook.js test <ext-folder> <script.js> [args...]
-# hoặc
 npm run vbook:test -- <ext-folder> <script.js> [args...]
 
 # Cài đặt extension trực tiếp vào VBook app
@@ -101,6 +105,7 @@ npm run vbook:install -- <ext-folder>
 # Đóng gói file ZIP plugin
 npm run vbook:build -- <ext-folder>
 
-# Cập nhật lại catalog tổng trước khi commit
+# Cập nhật lại catalog tổng và kiểm tra toàn vẹn trước khi commit
 npm run build:catalog
+npm run ext:verify
 ```

@@ -1,46 +1,66 @@
-# 🤖 Bản mẫu Hướng dẫn Agent viết Extension (Prompt Template)
+# Bảng câu lệnh prompt mẫu cho AI Agent (Prompt engineering cheatsheet)
 
-Tài liệu này là bản mẫu (template) chuẩn hóa bằng Tiếng Việt để gửi trực tiếp cho các AI Agent khác khi giao nhiệm vụ tạo mới, sửa lỗi, test hoặc refactor một Extension VBook.
-
----
-
-## 📋 BẢN GIAO NHIỆM VỤ CHI TIẾT (AGENT PROMPT)
+Tài liệu này cung cấp các mẫu câu lệnh ngắn gọn, chuẩn hóa theo 5 chế độ (`CREATE`, `FIX`, `TEST`, `AUDIT`, `REFACTOR`) của skill chuẩn để giao việc cho các AI Agent (Antigravity, Claude Code, Codex, Cursor).
 
 > [!NOTE]
-> *Sao chép toàn bộ nội dung từ phần này trở xuống để làm prompt đầu vào cho Agent.*
+> Toàn bộ quy tắc kiến trúc, ràng buộc Rhino ES6 Safe Mode và đường dẫn CLI đã được nạp tự động qua [`AGENTS.md`](../AGENTS.md) và [`.agents/skills/vbook-extensions/SKILL.md`](../.agents/skills/vbook-extensions/SKILL.md). Bạn chỉ cần gửi câu lệnh ngắn nêu rõ **mục tiêu**, **đường dẫn hoặc URL**, và **phạm vi cho phép** theo các mẫu dưới đây.
 
 ---
 
-### 1. Các nguyên tắc tối cao bắt buộc tuân thủ:
-* **Luôn đọc kỹ tài liệu trước khi lập trình**:
-  - Hợp đồng API chính thức (Master Spec): [docs/extension-api.md](./extension-api.md)
-  - Checklist kiểm tra dữ liệu: [docs/verify-checklist.md](./verify-checklist.md)
-  - Master Skill Specification: [.claude/skills/vbook-extensions/SKILL.md](../.claude/skills/vbook-extensions/SKILL.md)
-* **Quy tắc Môi trường Rhino (ES6 Safe Subset)**:
-  - CẤM VI PHẠM: Cấm khai báo biến trùng tên với key trong `plugin.json.config` (`let DOMAIN = ...` / `const DOMAIN = ...`), vì App tự động tiêm key dưới dạng `const KEY = "..."` trước khi script thực thi. Dùng `load('config.js')` và `BASE_URL`.
-  - LUÔN kiểm tra `if (!response.ok)` trước khi gọi `.html()`, `.json()`, `.text()`.
-  - TRÁNH: KHÔNG dùng `async/await`, `Promise`, optional chaining `?.`, nullish coalescing `??`, object/array spread (`{...obj}`), `Array.prototype.flat`, numeric separators.
-* **Quy trình Khởi tạo & Kiểm thử**:
-  - Dùng lệnh CLI để tạo khung: `npm run ext:create -- --name <Tên> --source <URL> --type <novel|comic|video|audio|tts|translate>`. Không tự tạo folder bằng tay.
-  - Chạy test trực tiếp qua REST-API: `npm run vbook:test -- <ext-folder> <script.js> [args...]`.
-  - Đóng gói & đồng bộ catalog: `npm run vbook:build -- <ext-folder>` và `npm run build:catalog`.
-* **Quy định bảo vệ dữ liệu**:
-  - Không tự ý commit/push code lên Git khi chưa được xác nhận.
-  - Không sửa các file `plugin.json` tổng hợp ở gốc bằng tay.
+## 1. Năm chế độ phát triển extension cốt lõi
+
+### Chế độ `CREATE` — Tạo mới một extension hoàn chỉnh
+
+> **Mẫu câu lệnh**:
+> ```text
+> Tạo mới extension <type> cho nguồn <https://domain.com> tại extensions/<type>/<slug>. Khảo sát live DOM/API, hiện thực đầy đủ các script hợp lệ và chạy vbook:test kiểm chứng từng script theo verify-checklist.
+> ```
+
+- **Ví dụ thực tế**:
+  - `Tạo mới extension novel cho nguồn https://truyenexample.com tại extensions/novel/kychi_truyenexample. Khảo sát live DOM, viết đầy đủ script và chạy vbook:test kiểm chứng từng script.`
+  - `Tạo mới extension news cho nguồn https://baoviet.example.com tại extensions/news/kychi_baoviet với home, genre, search và article.js.`
+
+### Chế độ `FIX` — Sửa lỗi, đổi tên miền hoặc cập nhật bộ chọn CSS
+
+> **Mẫu câu lệnh**:
+> ```text
+> Sửa extension <extensions/<type>/<slug>>: <mô tả lỗi hoặc domain mới>. Tái hiện lỗi qua vbook:test trước khi sửa, cập nhật selector/domain và kiểm chứng lại toàn bộ luồng bị ảnh hưởng.
+> ```
+
+- **Ví dụ thực tế**:
+  - `Sửa extension extensions/novel/kychi_ntruyen: đổi tên miền sang https://domainmoi.com, kiểm chứng lại home, detail, toc, chap, search và nâng version thêm 1.`
+  - `Sửa lỗi chap.js trả về nội dung rỗng trên extensions/comic/kychi_manga (kiểm tra lazy-load ảnh và referrerpolicy).`
+
+### Chế độ `TEST` — Kiểm thử chỉ đọc (Read-only Verification)
+
+> **Mẫu câu lệnh**:
+> ```text
+> Chạy kiểm thử read-only cho <extensions/<type>/<slug>> theo mode TEST (không sửa code): kiểm tra toàn bộ chuỗi script trên thiết bị và báo cáo đối chiếu với verify-checklist.
+> ```
+
+### Chế độ `AUDIT` — Quét sức khỏe hàng loạt trên kho lưu trữ
+
+> **Mẫu câu lệnh**:
+> ```text
+> Chạy audit sức khỏe cho <toàn bộ extensions/ hoặc danh sách thư mục> bằng vbook:testall và ext:validate. Phân loại trạng thái WORK, MOVED, EMPTY, CRASH, UNREACHABLE và lập bảng tổng hợp (không tự ý xóa hay sửa).
+> ```
+
+### Chế độ `REFACTOR` — Chuẩn hóa mã nguồn theo template mới
+
+> **Mẫu câu lệnh**:
+> ```text
+> Refactor <extensions/<type>/<slug>> theo mode REFACTOR: đồng bộ cấu trúc về chuẩn templates/<type> hiện hành, thay const bằng let, chuẩn hóa config.js/normalizeUrl và giữ nguyên tuyệt đối hành vi đầu ra.
+> ```
 
 ---
 
-### 2. Yêu cầu triển khai cụ thể:
+## 2. Mẫu câu lệnh đóng gói, bảo vệ mã nguồn và bảo trì dự án
 
-* **Tên Extension**: `[Nhập tên hiển thị tại đây]`
-* **Trang web nguồn (Source URL)**: `[Nhập URL trang nguồn tại đây]`
-* **Thể loại Extension (Type)**: `[novel | comic | video | audio | tts | translate]`
-* **Các lưu ý đặc thù**:
-  - `[Ghi chú thêm về cấu trúc trang, selector DOM, hoặc cơ chế mã hóa nếu có]`
+Các AI Agent được cấu hình không tự ý build, install, mã hóa hoặc commit nếu không được yêu cầu rõ. Khi cần thực hiện các bước này, hãy nêu tường minh trong câu lệnh:
 
----
-
-### 3. Tài liệu & Code tham khảo:
-* Bộ mẫu starter code chuẩn admin: `templates/[novel|comic|video|tts|translate]/`
-* Các extension đang hoạt động cùng thể loại trong: `extensions/[loại]/`
-* Hướng dẫn giải mã chống cào dữ liệu: [docs/DECRYPTION_PATTERNS.md](./DECRYPTION_PATTERNS.md)
+| Tác vụ | Câu lệnh prompt ngắn gọn |
+| :--- | :--- |
+| **Đóng gói và cập nhật catalog** | `Nâng version thêm 1 cho <ext-dir>, đóng gói plugin.zip, chạy npm run build:catalog và npm run ext:verify.` |
+| **Cài đặt thẳng vào thiết bị** | `Cài đặt trực tiếp <ext-dir> vào ứng dụng vBook qua npm run vbook:install.` |
+| **Làm rối và mã hóa AES** | `Chạy quy trình làm rối và mã hóa AES-256-CBC cho <ext-dir> bằng npm run encrypt:pipeline, sau đó kiểm chứng giải mã gói plugin.zip bằng npm run encrypt:decode.` |
+| **Đồng bộ skill từ upstream** | `Chạy npm run skill:sync để đồng bộ skill vbook-extensions, templates và tài liệu API mới nhất từ upstream Darkrai9x/vbook-extensions.` |

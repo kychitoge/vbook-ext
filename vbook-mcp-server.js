@@ -19,7 +19,7 @@ const path = require("path");
 const server = new Server(
   {
     name: "vbook-tool-server",
-    version: "3.0.0",
+    version: "3.1.0",
   },
   {
     capabilities: {
@@ -98,27 +98,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case "vbook_build_catalog": {
-        const output = execSync(`node ${path.join(__dirname, 'tools/cli/index.js')} build-catalog --json`).toString();
+        const output = execSync(`node "${path.join(__dirname, 'tools/cli/index.js')}" build-catalog --json`).toString();
         return { content: [{ type: "text", text: output }] };
       }
       case "vbook_build_extension": {
-        const output = execSync(`node ${path.join(__dirname, 'tools/cli/index.js')} build --plugin ${args.pluginPath} --json`).toString();
+        const output = execSync(`node "${path.join(__dirname, 'tools/cli/index.js')}" build --plugin "${args.pluginPath}" --json`).toString();
         return { content: [{ type: "text", text: output }] };
       }
       case "vbook_verify": {
-        const output = execSync(`node ${path.join(__dirname, 'tools/cli/index.js')} verify --json`).toString();
+        const output = execSync(`node "${path.join(__dirname, 'tools/cli/index.js')}" verify --json`).toString();
         return { content: [{ type: "text", text: output }] };
       }
       case "vbook_validate": {
-        const output = execSync(`node ${path.join(__dirname, 'tools/cli/index.js')} validate --plugin ${args.pluginPath} --json`).toString();
+        const output = execSync(`node "${path.join(__dirname, 'tools/cli/index.js')}" validate --plugin "${args.pluginPath}" --json`).toString();
         return { content: [{ type: "text", text: output }] };
       }
       case "vbook_analyze": {
-        const output = execSync(`node ${path.join(__dirname, 'tools/cli/index.js')} analyze ${args.url} --json`).toString();
+        const output = execSync(`node "${path.join(__dirname, 'tools/cli/index.js')}" analyze "${args.url}" --json`).toString();
         return { content: [{ type: "text", text: output }] };
       }
       case "vbook_check_env": {
-        const output = execSync(`node ${path.join(__dirname, 'tools/cli/index.js')} check-env --json`).toString();
+        const output = execSync(`node "${path.join(__dirname, 'tools/cli/index.js')}" check-env --json`).toString();
         return { content: [{ type: "text", text: output }] };
       }
       default:

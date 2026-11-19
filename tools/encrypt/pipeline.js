@@ -1,108 +1,65 @@
 #!/usr/bin/env node
 /**
- * PIPELINE.JS - Full Encryption Pipeline
- * Usage: node pipeline.js <extPath>
- * 
- * Performs: Obfuscate → Encrypt → Build ZIP
+ * Full encryption pipeline: Obfuscate -> Encrypt -> Build ZIP
+ * Usage: node tools/encrypt/pipeline.js <extPath>
  */
-
 'use strict';
 
 const path = require('path');
-const { execSync } = require('child_process');
 const { obfuscateExtension } = require('./obfuscate');
 const { encryptExtension } = require('./encrypt');
+const { buildExtensionZip } = require('../cli/build/build');
 
 async function fullEncryptionPipeline(extPath) {
-  console.log('\n' + '='.repeat(70));
-  console.log('🔒 FULL ENCRYPTION PIPELINE');
-  console.log('='.repeat(70));
-  
+  const workspaceRoot = path.resolve(__dirname, '..', '..');
   const absPath = path.resolve(extPath);
-  
-  // Step 1: Obfuscate
-  console.log('\n\n▶️  STEP 1: OBFUSCATE');
-  console.log('-'.repeat(70));
-  try {
-    const obfOk = obfuscateExtension(absPath);
-    if (!obfOk) throw new Error('Obfuscation failed');
-  } catch (err) {
-    console.error(`\n❌ Obfuscation failed: ${err.message}`);
+
+  console.log('\nFull encryption pipeline');
+  console.log('========================');
+
+  console.log('\nStep 1: Obfuscate source scripts');
+  const obfOk = obfuscateExtension(absPath);
+  if (!obfOk) {
+    console.error('Obfuscation failed. Fix syntax errors in src/*.js and try again.');
     return false;
   }
-  
-  // Step 2: Encrypt
-  console.log('\n▶️  STEP 2: ENCRYPT');
-  console.log('-'.repeat(70));
-  try {
-    const encOk = encryptExtension(absPath);
-    if (!encOk) throw new Error('Encryption failed');
-  } catch (err) {
-    console.error(`\n❌ Encryption failed: ${err.message}`);
+
+  console.log('\nStep 2: Encrypt bundled scripts');
+  const encOk = encryptExtension(absPath);
+  if (!encOk) {
+    console.error('Encryption failed. Verify plugin.json metadata and try again.');
     return false;
   }
-  
-  // Step 3: Build ZIP
-  console.log('\n▶️  STEP 3: BUILD ZIP');
-  console.log('-'.repeat(70));
-  try {
-    const pluginPath = path.join(absPath, 'plugin.json');
-    console.log(`Building ZIP from: ${pluginPath}`);
-    
-    // Run build command
-    const cmd = `node ./tools/cli/index.js build --plugin "${pluginPath}"`;
-    console.log(`\n$ ${cmd}\n`);
-    
-    execSync(cmd, { 
-      cwd: path.resolve(__dirname, '../../..'),
-      stdio: 'inherit'
-    });
-    
-    console.log(`✅ ZIP build completed`);
-  } catch (err) {
-    console.error(`\n⚠️  ZIP build warning (may already exist): ${err.message}`);
+
+  console.log('\nStep 3: Package plugin.zip');
+  const buildResult = await buildExtensionZip(workspaceRoot, absPath, false);
+  if (!buildResult || !buildResult.success) {
+    console.error('Packaging plugin.zip failed.');
+    return false;
   }
-  
-  // Summary
-  const pluginJson = path.join(absPath, 'plugin.json');
-  const zipPath = path.join(absPath, 'plugin.zip');
-  
-  console.log('\n' + '='.repeat(70));
-  console.log('✅ ENCRYPTION PIPELINE COMPLETED');
-  console.log('='.repeat(70));
-  console.log(`\n📁 Extension: ${absPath}`);
-  console.log(`📦 Plugin ZIP: ${zipPath}`);
-  console.log(`🔒 Encrypted: YES (metadata.encrypt = true)`);
-  console.log(`\n✨ Ready to deploy!\n`);
-  
+
+  console.log(`\nPipeline complete: ${buildResult.zipPath} (${buildResult.size} bytes, metadata.encrypt = true).`);
   return true;
 }
 
-// ─── Main ───────────────────────────────────────────────────────────────────
-
 if (require.main === module) {
   const args = process.argv.slice(2);
-  let extPath = null;
-  
-  for (let i = 0; i < args.length; i++) {
-    if (!args[i].startsWith('-')) {
-      extPath = args[i];
-      break;
-    }
-  }
-  
+  const extPath = args.find((a) => !a.startsWith('-'));
+
   if (!extPath) {
-    console.error('\nUsage: node pipeline.js <extPath>');
-    console.error('Example: node pipeline.js extensions/novel/kychi_truyencv\n');
+    console.error('Usage: node tools/encrypt/pipeline.js <extPath>');
+    console.error('Example: node tools/encrypt/pipeline.js extensions/novel/kychi_truyencv');
     process.exit(1);
   }
-  
+
   fullEncryptionPipeline(extPath)
-    .then(success => process.exit(success ? 0 : 1))
-    .catch(err => {
-      console.error(`\n❌ FATAL ERROR: ${err.message}`);
+    .then((success) => process.exit(success ? 0 : 1))
+    .catch((err) => {
+      console.error(`Error: ${err.message}`);
       process.exit(1);
     });
 }
 
-module.exports = { fullEncryptionPipeline };
+module.exports = {
+  fullEncryptionPipeline
+};
